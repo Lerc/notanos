@@ -1,0 +1,12 @@
+{
+	"bundleType" : "bundle/webapp",
+	"exec" : {
+			"action" :"Open",
+			"main": "word.html",
+			"contentType":"application/webapp",
+			"parameters" : {
+					"windowWidth" :700,
+					"windowHeight" :400
+			  }
+			}
+}

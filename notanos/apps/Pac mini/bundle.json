@@ -1,0 +1,13 @@
+{
+	"bundleType" : "bundle/webapp",
+	"exec" : {
+			"action" :"Open",
+			"main": "pac_tiny.html",
+			"contentType":"application/webapp",
+			"parameters" : {
+                    "title": "Pac Mini",
+					"windowWidth" :200,
+					"windowHeight" :165
+			  }
+			}
+}

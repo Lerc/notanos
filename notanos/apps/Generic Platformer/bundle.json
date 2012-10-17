@@ -1,0 +1,13 @@
+{
+	"bundleType" : "bundle/webapp",
+	"exec" : {
+			"action" :"Open",
+			"main": "index.html",
+			"contentType":"application/webapp",
+			"parameters" : {
+                    "title": "A very generic platform game",
+					"windowClientWidth" :800,
+					"windowClientHeight" :480
+			  }
+			}
+}

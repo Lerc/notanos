@@ -1,0 +1,185 @@
+.CodeMirror {
+/* Necessary so the scrollbar can be absolutely positioned within the wrapper on Lion. */
+position: relative;
+/* This prevents unwanted scrollbars from showing up on the body and wrapper in IE. */
+overflow: hidden;
+height: 100%;
+top: 0px;
+}
+
+
+.CodeMirror-scroll {
+overflow-x: auto;
+overflow-y: hidden;
+/* This is needed to prevent an IE[67] bug where the scrolled content
+is visible outside of the scrolling box. */
+position: relative;
+outline: none;
+height:100%;
+pointer:text;
+}
+
+
+body {
+	padding:0px;
+	margin:0px;
+}
+ul.menubar {
+	font-family: sans-serif;
+	font-size: 14px;
+	position:relative;
+	left:0px;
+	right:0px;
+	top:0px;
+	width:100%;
+	padding:0px;
+	margin:0px;
+	padding-top:2px;
+	border-bottom-style:groove;
+	border-bottom-width:2px;
+	background-color:#d0cec8;
+	
+	-webkit-user-select: none;
+  	-khtml-user-select: none;
+  	-moz-user-select: none;
+  	-o-user-select: none;
+  	user-select: none; 
+	cursor:default;
+    list-style-type:none;
+}
+
+ul.menubar>li {	
+	position:relative;
+	display:inline-block;
+	padding:4px;
+	margin:0px;
+	border: 1px solid rgba(0,0,0,0);
+}
+
+ul.menubar>li:hover {
+	background-color: rgba(0,0,128,0.05);
+}
+
+ul.menubar>li[data-toggle] {
+}
+ul.menubar>li[data-toggle="off"] {
+}
+ul.menubar>li[data-toggle="on"] {
+	background-color: rgba(0,0,125,0.25);
+}
+
+
+ul.menubar>li>ul {
+	list-style-type:none;
+	position:absolute;
+	top:30px;
+	visibility:hidden;
+	z-index:100000;
+	padding:0px;
+	background-color:#d0cec8;
+	border-width:1px;
+	border-style:outset;
+	border-color:#F0EeE8;
+	box-shadow: 2px 2px 2px rgba(0,0,0,0.5); 
+	-moz-box-shadow: 2px 2px 2px rgba(0,0,0,0.5); 
+	-webkit-box-shadow: 2px 2px 2px rgba(0,0,0,0.5); 
+	
+	appearance:menu;
+	-webkit-appearance:menu;
+	-moz-appearance:menu;
+}
+ul.menubar>li>ul>hr {
+	margin: 3px 0px;
+	border-color:white;
+	border-width: 1px;
+	border-style:inset;
+}
+ul.menubar>li[data-toggle="on"]>ul {
+	position:absolute;
+	top:30px;
+	visibility:visible;
+}
+
+ul.menubar>li[data-toggle="on"]>ul>li {
+	padding:0px;
+	padding:4px 20px;
+	margin:0px;
+}
+
+ul.menubar>li[data-toggle="on"]>ul>li:hover {
+	background-color: rgba(0,0,128,0.25);
+}
+
+ul.pagetabs {
+	overflow:hidden;
+	font-family: sans-serif;
+	font-size: 16px;
+	position:relative;
+	padding:0px;
+	margin:0px;
+	width:100%;
+	height:32px;
+	top:0px;
+	background-color:#d0cec8;	
+	-webkit-user-select: none;
+  	-khtml-user-select: none;
+  	-moz-user-select: none;
+  	-o-user-select: none;
+  	user-select: none; 
+	cursor:default;
+    list-style-type:none;
+}
+
+ul.pagetabs>li {	
+	position:relative;
+	display:inline-block;
+	padding:4px;
+	margin:0px;
+	margin-top:5px;
+	margin-left:0px;
+	background-color:#d0cec8;
+	border-radius: 8px 8px 0px 0px;
+	border: 1px outset #eee;
+	border-bottom-style:none;
+}
+
+ul.pagetabs>li:first-of-type {
+	margin-left: 2px;
+	margin-right: -4px;
+}
+
+ul.pagetabs>li[data-selected] {	
+	top:-2px;
+	background-color: #e0ded0;
+	padding-left:6px;
+	padding-right:6px;
+	padding-top:4px;
+	padding-bottom:6px;
+	
+	margin-top:2px;
+	margin-left:-2px;
+	margin-right:-2px;
+	z-index:1;
+	
+}
+
+ul.pagetabs>li:first-of-type[data-selected] {
+	margin-left: 0px;
+	margin-right: -6px;
+}
+
+ul.pagetabs>li[data-modified="true"] {
+	color: #f00;
+}
+
+.tabpager{
+}
+
+.tabpager>div {
+	background-color:#fff;
+	position:absolute; 
+	left:0px;
+	top:62px; 
+	right:0px; 
+	bottom:0px;
+}

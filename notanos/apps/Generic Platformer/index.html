@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Ludum20</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="language" content="en" />
+	<meta name="description" content="" />
+	<meta name="keywords" content="" />
+</head>
+<body style="background-color:#444">
+    <center> 
+    <div style="position:absolute; left: 0px; top: 0px; right: 0px; bottom; 0px" id="main"></div>
+    <canvas id="MainFrame" style="position:absolute; left: 0px; top: 0px; right: 0px; bottom; 0px;"></canvas>
+    </center>
+	<div id="haxe:trace"></div>
+    <script> 
+        var canvas = document.getElementById("MainFrame");
+        
+        canvas.width = 800;//window.innerWidth;
+        canvas.height = 480;//window.innerHeight;
+
+    </script>
+	<script src="InputManager.js"></script>	
+	<script src="frameTimer2.js"></script>
+	<script src="Ludum20.js"></script>
+</body>
+</html>

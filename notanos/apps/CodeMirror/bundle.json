@@ -1,0 +1,13 @@
+{
+	"bundleType" : "bundle/webapp",
+	"exec" : {
+			"action" :"Open",
+			"main": "editor.html",
+			"contentType":"application/webapp",
+			"parameters" : {
+					"windowWidth" :700,
+					"windowHeight" :400,
+					"singleInstance" : true
+			  }
+			}
+}
