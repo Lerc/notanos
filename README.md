@@ -1,9 +1,12 @@
 Notanos - Not really an operating system
 ========================================
 
-This is just a pile of Javascript pretending to be a desktop environment.
+This is just a pile of Javascript pretending to be a desktop environment, b ut hosted from your phone?  Weird huh.
 
-This is it running on a Novo7 Aurora [http://www.youtube.com/watch?v=8028AwxF8_g]
+It looks a bit like this. 
+![](https://raw.github.com/Lerc/notanos/master/screenshot.png)
+
+This is it serving from a Novo7 Aurora and clienting from WinXP Chrome[ http://www.youtube.com/watch?v=8028AwxF8_g ].  I am assured clienting is a real word.
 
 
 You can use it as a cloud in your pocket.
