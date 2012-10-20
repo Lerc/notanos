@@ -1,7 +1,7 @@
 Notanos - Not really an operating system
 ========================================
 
-This is just a pile of Javascript pretending to be a desktop environment, b ut hosted from your phone?  Weird huh.
+This is just a pile of Javascript pretending to be a desktop environment, but hosted from your phone?  Weird huh.
 
 It looks a bit like this. 
 ![](https://raw.github.com/Lerc/notanos/master/screenshot.png)
@@ -11,8 +11,8 @@ This is it serving from a Novo7 Aurora and clienting from WinXP Chrome[ http://w
 
 You can use it as a cloud in your pocket.
 
- * Decompress notanos.tar.gz onto a path your Android device
- * Run a simple server on your Android Device to serve the decompressed directory
+ * Decompress [notanos.tar.gz](https://github.com/downloads/Lerc/notanos/notanos.tar.gz) onto a path your Android device
+ * Run [a simple server](https://play.google.com/store/apps/details?id=com.icecoldapps.webdavserverultimate&hl=en) on your Android Device to serve the decompressed directory
  * Find the ip:port where your desktop machine can see the server
  * Visit http://ip:port/index.html in your favourite web browser.
  
