@@ -285,6 +285,7 @@ ul.fileview.icons > li   {
 
 ul.fileview.icons>li>.image {
   display:block;
+	background-size: contain;
   width:48px;
 	height:48px;	
 }
