@@ -1059,21 +1059,22 @@ function getJXONTree (oXMLParent) {
 			}
 			var dir=getRawDirectory(container.name);
 			 
-			if (dir.some(fileNameIs(container.name+"bundle.json"))) {
+			if (dir.some(fileNameIs(container.name+"/bundle.json"))) {
 				  container.contentType="directory/bundle";
 			}
 		}
 		
 		function sanitizeResponse(response) {
 			var properties = response.propstat.prop;
+			var name=response.href;
+			if (name.endsWith("/"))name=name.slice(0,-1);
 			var saneResponse = {
-				"name":response.href,
+				"name":name,
 				"container" : properties.resourcetype.hasOwnProperty("collection"),
 			};
-
 			if (properties.getlastmodified) saneResponse.lastModified = properties.getlastmodified;
 			if (properties.displayname) saneResponse.displayName = properties.displayname;
-			if (properties.getcontentlength) saneResponse.conentLength = properties.getcontentlength;
+			if (properties.getcontentlength) saneResponse.contentLength = properties.getcontentlength;
 			
 			saneResponse.contentType = WebDav.mimeExtensions[saneResponse.name.split(".").pop()];
 			if (saneResponse.container===true) {saneResponse.contentType = "directory";}
@@ -1100,6 +1101,7 @@ function getJXONTree (oXMLParent) {
 	}
 	function getRawDirectory(name) {
 			var request = new XMLHttpRequest();
+			if (!name.endsWith("/")) name+="/";
 			request.open('PROPFIND', name, false);
 			request.setRequestHeader("depth",1);
 			request.send();
