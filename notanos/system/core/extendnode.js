@@ -1,7 +1,3 @@
-//this file should be renamed because it now has more than just Node extensions
-//nothing too complex here though.
-
-//node Extensions
 Node.prototype.appendNew = function(type,className,id) {
   var result = this.ownerDocument.createElement(type);
   this.appendChild(result);
@@ -33,8 +29,3 @@ Node.prototype.toggleClass = function(className) {
 		this.className+=" "+className;
 	}
 }
-
-//String Extensions 
-String.prototype.endsWith = function(suffix) {
-    return this.indexOf(suffix, this.length - suffix.length) !== -1;
-};
