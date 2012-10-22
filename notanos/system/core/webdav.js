@@ -1058,7 +1058,7 @@ function getJXONTree (oXMLParent) {
 				 return function (i) {return i.href==name};
 			}
 			var dir=getRawDirectory(container.name);
-			 
+			dir.shift();//first entry is itself
 			if (dir.some(fileNameIs(container.name+"/bundle.json"))) {
 				  container.contentType="directory/bundle";
 			}
@@ -1088,7 +1088,7 @@ function getJXONTree (oXMLParent) {
 			return saneResponse;
 		}
 		
-	  WebDav.getInfo = function(name) {
+	WebDav.getInfo = function(name) {
 			var request = new XMLHttpRequest();
 			request.open('PROPFIND', name, false);
 			request.setRequestHeader("depth",0);
@@ -1099,7 +1099,9 @@ function getJXONTree (oXMLParent) {
 				return(sanitizeResponse(jsonResponse.multistatus.response));
 			}
 	}
+	
 	function getRawDirectory(name) {
+		  console.log("getRawDirectory('"+name+"');");
 			var request = new XMLHttpRequest();
 			if (!name.endsWith("/")) name+="/";
 			request.open('PROPFIND', name, false);
@@ -1134,7 +1136,10 @@ function getJXONTree (oXMLParent) {
 			request.send(data);
 			  //it's fire and forget I'm afraid for now	
 		}
-		
+	
+	WebDav.arePathsEquivalent = function (patha,pathb) 	{
+		return patha==pathb;
+	}
 	return WebDav;	
 }();
 
