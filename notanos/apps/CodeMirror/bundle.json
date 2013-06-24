@@ -1,5 +1,6 @@
 {
 	"bundleType" : "bundle/webapp",
+    "icon" : "codemirror-baboon-icon.png",
 	"exec" : {
 			"action" :"Open",
 			"main": "editor.html",

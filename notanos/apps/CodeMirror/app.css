@@ -9,16 +9,10 @@ top: 0px;
 
 
 .CodeMirror-scroll {
-overflow-x: auto;
-overflow-y: hidden;
-/* This is needed to prevent an IE[67] bug where the scrolled content
-is visible outside of the scrolling box. */
-position: relative;
-outline: none;
+overflow: auto;
+position:relative;
 height:100%;
-pointer:text;
 }
-
 
 body {
 	padding:0px;
@@ -37,7 +31,7 @@ ul.menubar {
 	padding-top:2px;
 	border-bottom-style:groove;
 	border-bottom-width:2px;
-	background-color:#d0cec8;
+	background-color:#EEF;
 	
 	-webkit-user-select: none;
   	-khtml-user-select: none;
@@ -76,7 +70,7 @@ ul.menubar>li>ul {
 	visibility:hidden;
 	z-index:100000;
 	padding:0px;
-	background-color:#d0cec8;
+	background-color:#EEF;
 	border-width:1px;
 	border-style:outset;
 	border-color:#F0EeE8;
@@ -120,7 +114,7 @@ ul.pagetabs {
 	width:100%;
 	height:32px;
 	top:0px;
-	background-color:#d0cec8;	
+	background-color:#DDE;	
 	-webkit-user-select: none;
   	-khtml-user-select: none;
   	-moz-user-select: none;
@@ -137,7 +131,7 @@ ul.pagetabs>li {
 	margin:0px;
 	margin-top:5px;
 	margin-left:0px;
-	background-color:#d0cec8;
+	background-color:#EEF;
 	border-radius: 8px 8px 0px 0px;
 	border: 1px outset #eee;
 	border-bottom-style:none;
@@ -150,7 +144,7 @@ ul.pagetabs>li:first-of-type {
 
 ul.pagetabs>li[data-selected] {	
 	top:-2px;
-	background-color: #e0ded0;
+	background-color: #FFF;
 	padding-left:6px;
 	padding-right:6px;
 	padding-top:4px;

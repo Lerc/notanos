@@ -24,7 +24,7 @@ Node.prototype.addClass = function(className) {
 
 Node.prototype.toggleClass = function(className) {
 	if (this.hasClass(className)) {
-		 removeClass(className);
+		 this.removeClass(className);
 	} else {
 		this.className+=" "+className;
 	}

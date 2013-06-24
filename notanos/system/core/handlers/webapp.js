@@ -6,6 +6,9 @@
 		"Open" : {
 			description : "Run program",
 			act : function(name,parameters) {
+								var left=parameters.windowLeft;
+								var top=parameters.windowTop;
+
 								var width=parameters.windowWidth;
 								var height=parameters.windowHeight;
 								var clientWidth=parameters.windowClientWidth;
@@ -29,7 +32,7 @@
 									frame.frameElement.focus();
 								} else {					
 									var win=DivWin.createWindow(	{
-												"width":width,"height":height, "clientWidth": clientWidth, "clientHeight":clientHeight, title:parameters.title
+												"left":left, "top":top, "width":width,"height":height, "clientWidth": clientWidth, "clientHeight":clientHeight, title:parameters.title
 												});
 									var frameOverlay=win.clientArea.appendNew("div","fillparent frameoverlay");
 									frame=win.clientArea.appendNew("iframe","fillparent");
@@ -41,8 +44,8 @@
 										log("sending a message to frame");
 										var message = JSON.stringify(execMessage);
 										log(message);
-										frame.contentWindow.postMessage(execMessage,"*");
 										frame.focus();
+										frame.contentWindow.postMessage(execMessage,"*");
 									}
 								}
 			}

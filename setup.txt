@@ -1,0 +1,38 @@
+Notanos:  It's not an OS.
+
+Currently supporting i386 and Arm.
+
+The first three steps just provide a dependancy then set up a user in which we do the real work.
+This should ease concerns about running strange foreign programs on your system.
+(should you lack easy_install you will need to install that first.  (  "sudo apt-get install python-setuptools"  on Ubuntu)) 
+
+         sudo easy_install -U wsgidav
+         sudo adduser somenewuser
+         sudo login somenewuser
+
+You should be logged in as a new user to download the support binaries.
+
+If you are running on arm use.
+
+         wget http://fingswotidun.com/cruft/nossupportbin-arm.tar.gz
+         tar -xzf nossupportbin-arm.tar.gz
+
+if you are running on i386 use 
+
+         wget http://fingswotidun.com/cruft/nossupportbin-i386.tar.gz
+         tar -xzf nossupportbin-i386.tar.gz
+
+next grab notanos itself
+
+	wget http://fingswotidun.com/cruft/notanos.tar.gz
+	tar -xzf notanos.tar.gz 
+	sh startnosserver.sh 
+
+
+The server should now be running.  
+From a browser open navigate to the machine at port 8009
+for the same machine as the server just use localhost
+
+http://localhost:8009/index.html
+
+

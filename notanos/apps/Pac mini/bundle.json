@@ -1,5 +1,6 @@
 {
 	"bundleType" : "bundle/webapp",
+    "icon" : "pac-mini.png",
 	"exec" : {
 			"action" :"Open",
 			"main": "pac_tiny.html",

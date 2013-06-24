@@ -1,0 +1,144 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>CK editor</title>
+    <script src="ckeditor.js"></script>
+    <link rel="stylesheet" href="app.css">
+    <script src="extendnode.js"></script>
+    <script src="clientframe.js"></script>
+  </head>
+  <body>
+<div id="everything" style="position:absolute;top:0px;left:0px;right:0px;bottom:0px;">  
+<ul id="menu" class="menubar" data-mutuallyexclusive data-springuponclick>
+  <li data-toggle="off" >File
+  <ul>
+     <li onclick="makeNewPage();">New</li>
+     <li onclick="menuOpen()">Open</li>
+     <li onclick="save();">Save</li>
+     <hr>
+     <li data-clickaction="quit">Quit</li>
+  </ul></li>
+  <li data-toggle="off" >Edit
+  <ul>
+     <li>Undo</li>
+     <hr>
+     <li>Cut</li>
+     <li>Copy</li>
+     <li>Paste</li>
+  </ul></li>
+  <li data-toggle="off" >View
+  <ul>
+     <li>something</li>
+  </ul></li>
+  <li data-toggle="off" >Language
+  <ul>
+     <li>something</li>
+  </ul></li>     
+  <li data-toggle="off" >Help
+  <ul>
+     <li onclick="CKEDITOR.instances.editor1.commands.about.exec()">About</li>   
+  </ul></li>
+</ul>
+<textarea id="editor1" name="editor1">Stuff
+</textarea>
+
+</div>
+<script>   
+    var everything=document.getElementById("everything");
+    var menu=document.getElementById("menu");
+    var editor;
+    
+    window.onresize = function() {
+      editor.resize("100%",everything.offsetHeight-menu.offsetHeight);
+    }
+    
+      function menuOpen() {
+        ClientFrame.openFileDialog("/",function(result){
+          //alert("open " + result);
+          if (result) { addEditor(result) };
+        });
+      }
+      function simulateClick(target) {
+         var evt = document.createEvent("MouseEvents");
+         evt.initMouseEvent("click", true, true, window,
+            0, 0, 0, 0, 0, false, false, false, false, 0, null);
+        target.dispatchEvent(evt);
+      }
+      
+      function makeNewPage() {
+        //
+      }
+      
+      function editorChanged(editor) {
+      }
+      
+      function save(editor) {
+      }
+     
+      function addEditor(name) {
+      }
+      
+      document.body.addEventListener("click",function (e) { 
+        //a click anywhere should make the springy buttons pop up
+          var nodelist=document.querySelectorAll("[data-springuponclick]>[data-toggle=on]"); 
+          for (var i = 0; i < nodelist.length; ++i) {
+             nodelist[i].dataset["toggle"]="off";
+          };
+        //if it's a toggle toggle with mutually exclusive 
+          var t=e.target.dataset["toggle"];  
+          if(t) {
+            var newValue =(t=="on")?"off":"on";
+            if (newValue==="on") {
+              var oldone = e.target.parentNode.querySelector("[data-mutuallyexclusive]>[data-toggle=on]");
+              if (oldone) oldone.dataset["toggle"]="off";
+            }
+            e.target.dataset["toggle"]=newValue;
+          }
+          
+          if (e.target.parentNode.dataset["mutuallyexclusive"] ==="required") {             
+             if (!e.target.dataset["selected"]) {
+                oldone = e.target.parentNode.querySelector('[data-mutuallyexclusive="required"]>[data-selected]');
+                if (oldone) delete (oldone.dataset["selected"]);
+                e.target.dataset["selected"]="";
+             }
+             
+          }
+        });
+        
+       var menu = document.querySelector("ul.menubar");
+       menu.addEventListener("click",function (e) {
+          var cmd=e.target.dataset["clickaction"]
+          if (cmd) {alert(cmd);  }});
+       
+       ClientFrame.onActionNotify=function(action) {
+          if (action.actionKind=="Open") {
+            addEditor(action.fileName);
+          }
+       }
+       
+       CKEDITOR.replace( 'editor1',{resize_enabled:false} );
+       editor = CKEDITOR.instances.editor1;
+       
+       document.addEventListener("keydown",handleKeyDown,true);
+       
+       function handleKeyDown(e) {
+        if (e.ctrlKey) {
+           var handled=true;
+           switch (e.keyCode) {
+              case 83://  DOM_VK_S
+                 save();
+              break;
+              case 81://  DOM_VK_Q
+              break;
+              default:
+                handled=false;
+           }
+           if (handled===true) e.preventDefault();
+        }
+       }
+       
+       setTimeout("window.onresize()",1000);
+    </script>
+  </body>
+</html>

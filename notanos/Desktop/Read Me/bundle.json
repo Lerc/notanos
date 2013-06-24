@@ -1,0 +1,16 @@
+{
+	"bundleType" : "bundle/webapp",
+    "icon" : "huh.svg",
+	"exec" : {
+			"action" :"Open",
+			"main": "readme.html",
+			"contentType":"application/webapp",
+			"parameters" : {
+                    "title": "Rambling about Notanos",
+                    "windowLeft":100,
+                    "windowTop":0,
+					"windowClientWidth" :750,
+					"windowClientHeight" :800
+			  }
+			}
+}

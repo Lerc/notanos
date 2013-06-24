@@ -11,7 +11,7 @@ function parseText (sValue) {
  
 function getJXONTree (oXMLParent) {
   var vResult = /* put here the default value for empty nodes! */ true, nLength = 0, sCollectedTxt = "";
-  if (oXMLParent.hasAttributes()) {
+  if (oXMLParent.hasAttributes && oXMLParent.hasAttributes()) {
     vResult = {};
     for (nLength; nLength < oXMLParent.attributes.length; nLength++) {
       oAttrib = oXMLParent.attributes.item(nLength);
@@ -1058,9 +1058,13 @@ function getJXONTree (oXMLParent) {
 				 return function (i) {return i.href==name};
 			}
 			var dir=getRawDirectory(container.name);
-			dir.shift();//first entry is itself
-			if (dir.some(fileNameIs(container.name+"/bundle.json"))) {
-				  container.contentType="directory/bundle";
+			if (Array.isArray(dir)) {
+				dir.shift();//first entry is itself
+				var bundleName = container.name+"/bundle.json";
+				if (dir.some(fileNameIs(bundleName))) {
+					container.contentType="directory/bundle";
+					container.bundleData=JSON.parse(WebDav.getData(bundleName));
+				}
 			}
 		}
 		
@@ -1101,7 +1105,7 @@ function getJXONTree (oXMLParent) {
 	}
 	
 	function getRawDirectory(name) {
-		  console.log("getRawDirectory('"+name+"');");
+		  //console.log("getRawDirectory('"+name+"');");
 			var request = new XMLHttpRequest();
 			if (!name.endsWith("/")) name+="/";
 			request.open('PROPFIND', name, false);

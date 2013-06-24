@@ -119,6 +119,7 @@
       }
       
       function save(editor) {
+        if(!editor) editor=activePage.editor;
         ClientFrame.saveFile(editor.fileName,editor.getValue());
         editor.modified=false;
         editor.tab.dataset["modified"]=editor.modified;  
@@ -155,16 +156,15 @@
             editorDiv.editor = CodeMirror(editorDiv, {
                 value: content,  
                 lineNumbers: true,
-                matchBrackets: true,
-                onChange :editorChanged
+                matchBrackets: true
             });
-
-            editorDiv.editor.tab = li;
-            editorDiv.editor.modified = false;
-            editorDiv.editor.fileName=name;
-            if (!name) {
-              li.textContent="untitled";
-            } else {
+		editorDiv.editor.on("change",editorChanged);
+		editorDiv.editor.tab = li;
+		editorDiv.editor.modified = false;
+		editorDiv.editor.fileName=name;
+		if (!name) {
+			li.textContent="untitled";
+		} else {
              li.textContent=name.split('/').pop();
              
              editorDiv.editor.setOption("mode",pickType(name));

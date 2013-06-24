@@ -1,5 +1,6 @@
 {
 	"bundleType" : "bundle/webapp",
+    "icon": "platform1.png",
 	"exec" : {
 			"action" :"Open",
 			"main": "index.html",

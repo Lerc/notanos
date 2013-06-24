@@ -30,6 +30,20 @@ BODY {
   z-index:9999999999;
 }
 
+.fullscreentoggle {
+  position: absolute;
+  left:0px;
+  top:0px;
+  width:10px;
+  height:10px;
+  background-color:white;
+  opacity:0;
+}
+
+.fullscreentoggle:hover {
+  opacity:0.8;
+}
+
 .miniwin {
 	font-family: 'Droid Sans', arial, sans-serif;
   FONT-SIZE: 16px;
@@ -61,7 +75,7 @@ BODY {
 
 .miniwin  {z-index: -10;}
 
-.miniwin.frame.active {
+.miniwin.frame.unfocused {
 	z-index: 1;
 }
 
@@ -102,7 +116,7 @@ BODY {
 	-o-transition:all 500ms;
 	
 }
-.miniwin.active > .titlebar
+.miniwin.focused > .titlebar
 {
 	background-color:#46a;
 }
@@ -237,18 +251,23 @@ ul.fileview {
 	BACKGROUND-COLOR: rgba(0,0,0,0);
   display:block;
   margin: 1em;
-  padding: 0px;
+  padding: 2px;
   list-style-type: none;
     transition:all 500ms;
 	-webkit-transition:all 500ms;
 	-o-transition:all 500ms;
-	overflow:auto;
+	overflow : visible;
+}
+
+.clientarea>.fileview.details {
+	overflow:visible;
 }
 
 ul.fileview.icons > li {
 	display: inline-block;
 	margin:2em;
-	margin-bottom:3em;
+	margin-bottom:2em;
+/*	
   BACKGROUND-COLOR: rgba(192,128,200,0.5);
 	border-top: 1px solid #fff;
 	border-left: 1px solid #fff;
@@ -259,6 +278,8 @@ ul.fileview.icons > li {
 	box-shadow: 2px 2px 5px #444; 
 	-moz-box-shadow: 2px 2px 5px #444; 
 	-webkit-box-shadow: 2px 2px 5px #444; 
+*/
+	border-radius: 8px 8px 8px 8px;
 	width:48px;
 	height:48px;
 	bottom: 1px;
@@ -271,7 +292,7 @@ ul.fileview.icons > li {
 
 }
 ul.fileview.icons > li:hover {
-	BACKGROUND-COLOR: rgba(230,192,256,1);
+	box-shadow: 0px 0px 10px 10px rgba(0,32,64,0.7);
 }
 
 ul.fileview.icons > li   {
@@ -286,6 +307,7 @@ ul.fileview.icons > li   {
 ul.fileview.icons>li>.image {
   display:block;
 	background-size: contain;
+	margin:1px;
   width:48px;
 	height:48px;	
 }
@@ -307,7 +329,7 @@ ul.fileview.icons > li:hover  {
 }
 
 ul.fileview.icons > li:hover>.displayName {
-  background-color : white;
+  background-color : rgba(255,255,255,0.6);
   outline: 1px solid rgba(0,0,0,0.5);
   overflow:visible;
 	word-wrap:break-word;	
@@ -320,21 +342,23 @@ ul.fileview.details > li {
 	position:relative;
 	top:0px;
 	left:0px;
+	width:560px;
 	text-align:left;
 }
 
 ul.fileview.details > li>* {
-  position: absolute;
+  position: relative;
   overflow:hidden;
 }
 
 ul.fileview.details>li>.image {
-  display:block;
+	display:inline-block;
 	background-size: contain;
+	top:2px;
+	left:12px;
   width:20px;
-	height:20px;	  
+	height:20px;	
 }
-
 
 ul.fileview.details > li:nth-child(even)>*{
   background-color: rgba(150,200,0,0.05);
@@ -348,20 +372,22 @@ ul.fileview.details > li:hover>*{
 }
 
 ul.fileview.details > li>.displayName {
-  display:inline;
+  display:inline-block;
   left:32px;
   width:200px
 }
 ul.fileview.details > li>.fileSize {
-  display:inline;
-  left:232px;
-  width:64px;
+  display:inline-block;
+  text-align: right;
+  left:40px;
+  width:110px;
 }
 
 ul.fileview.details > li>.contentType {
-  display:inline;
-  left:300px;
-  width: 120px;
+  display:inline-block;
+  text-align: center;
+  left:60px;
+  width: 140px;
 }
 
 ul.fileview.list {
@@ -424,12 +450,28 @@ ul.fileview > li[data-contentclass='directory']>.image {
   background-image: url('/system/data/icons/default/mimetypes/directory.svg');
 }
 
+ul.fileview > li[data-contentclass='image']>.image {
+  background-image: url('/system/data/icons/default/mimetypes/image.svg');
+}
+
+ul.fileview > li[data-contenttype='image/svg+xml']>.image {
+  background-image: url('/system/data/icons/default/mimetypes/image-svg+xml.svg');
+}
+
 ul.fileview > li[data-contenttype='application/javascript']>.image {
   background-image: url('/system/data/icons/default/mimetypes/application-javascript.svg');
 }
 
+ul.fileview > li[data-contenttype='application/json']>.image {
+  background-image: url('/system/data/icons/default/mimetypes/application-json.svg');
+}
+
 ul.fileview > li[data-contenttype='directory/bundle']>.image {
   background-image: url('/system/data/icons/default/categories/applications-other.svg');
+}
+
+ul.fileview > li[data-contenttype='directory/bundle']>.image[data-bundleicon]{
+
 }
 
 .requester {
@@ -608,3 +650,273 @@ ul.fileview > li[data-contenttype='directory/bundle']>.image {
     display:inline-block;
     padding:6px;    
 }
+
+.dragorigin {
+  background-color : #ff0000;
+}
+
+*[data-dropquery] {
+  outline: 4px #aaf dashed;
+}
+
+.panel {
+  background-color:white;
+  position:absolute;
+}
+.panel.horizontal {
+ height:32px;
+ 
+ background: rgb(184,198,223); /* Old browsers */
+ background: -moz-linear-gradient(top, rgba(184,198,223,1) 0%, rgba(109,136,183,1) 100%); /* FF3.6+ */
+ background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(184,198,223,1)), color-stop(100%,rgba(109,136,183,1))); /* Chrome,Safari4+ */
+ background: -webkit-linear-gradient(top, rgba(184,198,223,1) 0%,rgba(109,136,183,1) 100%); /* Chrome10+,Safari5.1+ */
+ background: -o-linear-gradient(top, rgba(184,198,223,1) 0%,rgba(109,136,183,1) 100%); /* Opera 11.10+ */
+ background: -ms-linear-gradient(top, rgba(184,198,223,1) 0%,rgba(109,136,183,1) 100%); /* IE10+ */
+ background: linear-gradient(to bottom, rgba(184,198,223,1) 0%,rgba(109,136,183,1) 100%); /* W3C */
+
+}
+.panel.vertical {
+ width:64px;
+}
+.panel.horizontal.stretched {
+ left:0px;
+ right:0px;
+}
+.panel.vertical.stretched {
+ top:0px;
+ bottom:0px;
+}
+.panel.vertical.left {
+ left:0px;
+}
+.panel.vertical.right {
+ right:0px;
+}
+.panel.horizontal.top {
+ top:0px;
+}
+.panel.horizontal.bottom {
+ bottom:0px;
+}
+
+.taskbaritem {
+  display:inline-block;
+  position:relative;
+  overflow:hidden;
+  width: 140px;
+  height: 32px;
+  padding:0px;
+  padding-left:10 px;
+  box-shadow: inset -1px -1px 1px 1px rgba(0,0,0,0.5),inset 1px 1px 1px 1px rgba(255,255,255,0.5);
+}
+.taskbaritem>.caption {
+	display:inline-block;
+	width:120px;
+	overflow:hidden;
+  position:absolute;
+  left:40px;
+  bottom:4px;
+  white-space: nowrap;
+  text-overflow:ellipsis;
+  
+}
+.taskbaritem>.icon {
+  position:absolute;
+  display:inline-block;
+  width:24px;
+  height:24px;
+  left:10px;
+  top:6px;
+}
+.taskbaritem:hover {
+	background: rgb(242,246,248); /* Old browsers */
+	background: -moz-linear-gradient(top, rgba(242,246,248,1) 0%, rgba(216,225,231,1) 50%, rgba(181,198,208,1) 51%, rgba(224,239,249,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(242,246,248,1)), color-stop(50%,rgba(216,225,231,1)), color-stop(51%,rgba(181,198,208,1)), color-stop(100%,rgba(224,239,249,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, rgba(242,246,248,1) 0%,rgba(216,225,231,1) 50%,rgba(181,198,208,1) 51%,rgba(224,239,249,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, rgba(242,246,248,1) 0%,rgba(216,225,231,1) 50%,rgba(181,198,208,1) 51%,rgba(224,239,249,1) 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, rgba(242,246,248,1) 0%,rgba(216,225,231,1) 50%,rgba(181,198,208,1) 51%,rgba(224,239,249,1) 100%); /* IE10+ */
+	background: linear-gradient(to bottom, rgba(242,246,248,1) 0%,rgba(216,225,231,1) 50%,rgba(181,198,208,1) 51%,rgba(224,239,249,1) 100%); /* W3C */
+}
+
+.taskbaritem.focused {
+	box-shadow: inset 1px 1px 1px 1px rgba(0,0,0,0.8),
+							inset 5px 5px 4px 4px rgba(0,0,0,0.4),
+							inset -1px -1px 1px 1px white;
+	background: rgb(242,246,248); /* Old browsers */
+	background: -moz-linear-gradient(top, rgba(242,246,248,1) 0%, rgba(216,225,231,1) 50%, rgba(181,198,208,1) 51%, rgba(224,239,249,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(242,246,248,1)), color-stop(50%,rgba(216,225,231,1)), color-stop(51%,rgba(181,198,208,1)), color-stop(100%,rgba(224,239,249,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, rgba(242,246,248,1) 0%,rgba(216,225,231,1) 50%,rgba(181,198,208,1) 51%,rgba(224,239,249,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, rgba(242,246,248,1) 0%,rgba(216,225,231,1) 50%,rgba(181,198,208,1) 51%,rgba(224,239,249,1) 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, rgba(242,246,248,1) 0%,rgba(216,225,231,1) 50%,rgba(181,198,208,1) 51%,rgba(224,239,249,1) 100%); /* IE10+ */
+	background: linear-gradient(to bottom, rgba(242,246,248,1) 0%,rgba(216,225,231,1) 50%,rgba(181,198,208,1) 51%,rgba(224,239,249,1) 100%); /* W3C */
+}
+
+.panel>.clock {
+	position:absolute;
+	right:0px;
+	bottom:4px;
+	width:80px;
+}
+
+.desktop {
+ z-index:-1000;
+ position:absolute;
+ left:0px;
+ top:0px;
+ right:0px;
+ bottom:0px;
+}
+
+
+
+
+
+/**
+ * Circular Tooltip (SO)
+ * derived from http://stackoverflow.com/q/13132864/1397351
+ * removed end tabs and generally mutilated
+ */
+
+.arcmenu {
+	position: absolute;
+	top: 50%; left: 50%;
+	font: 1.5em/1.13 Verdana, sans-serif;
+	transition: .5s;
+	z-index:100;
+	/*background-color:black;  */
+	opacity: 1;
+}
+
+.arcmenu.hidden {
+	-webkit-transform: scale(.001);
+	transform: scale(.001);
+	opacity: 0;
+}
+
+/* generic link styles */
+.arcmenu span {
+	display: block;
+	opacity: .76;
+	background-color: #AAA;
+	color: #7a8092;
+	text-align: center;
+	text-decoration: none;
+	text-shadow: 0 -1px dimgrey;
+}
+.arcmenu span>img { width:36px; height:36px;}
+
+.arcmenu span:hover, .arcmenu span:focus { opacity: 1; }
+.arcmenu span:hover { outline: none;
+ }
+/* circular menu */
+.tip {
+	z-index: 1;
+	/**outline: dotted 1px white;/**/
+	margin: -126px;
+	width: 6em; height: 6em;
+	list-style: none;
+	opacity: 0;
+	-webkit-transform: scale(1);
+	transform: scale(1);
+	
+}
+/* the ends of the menu */
+.tip:before, .tip:after {
+	display:none;
+	position: absolute;
+	top: 51%;
+	width: .3em; height: 24%;
+	opacity: 1;
+	background-color: none;
+	content: '';
+}
+.tip:before {
+	left: -11.5%;
+	border-radius: .25em 0 0 .25em;
+	box-shadow: -1px 0 1px dimgrey, inset 1px 0 1px white, inset -1px 0 1px grey, 
+				inset 0 1px 1px white, inset 0 -1px 1px white;
+	transform: rotate(-80deg);
+}
+.tip:after {
+	right: -11.5%;
+	border-radius: 0 .25em .25em 0;
+	box-shadow: 1px 0 1px dimgrey, inset -1px 0 1px white, inset 1px 0 1px grey,
+				inset 0 1px 1px white, inset 0 -1px 1px white;
+	transform: rotate(80deg);
+}
+/* make the menu appear on click */
+/*.button:focus + .tip {*/
+.tip {
+	opacity: 1;
+	margin-top: -80px;
+}
+/* slices of the circular menu */
+.slice {
+	overflow: hidden;
+	position: absolute;
+	/**outline: dotted 1px yellow;/**/
+	width: 50%; height: 80%;
+ -webkit-transform-origin: 100% 100%;
+	transform-origin: 100% 100%;
+}
+/* 
+ * rotate each slice at the right angle = (A/2)° + (k - (n+1)/2)*A°
+ * where A is the angle of 1 slice (30° in this case)
+ * k is the number of the slice (in {1,2,3,4,5} here)
+ * and n is the number of slices (5 in this case)
+ * formula works for odd number of slices (n odd)
+ * for even number of slices (n even) the rotation angle is (k - n/2)*A°
+ * 
+ * after rotating, skew on Y by 90°-A°; here A° = the angle for 1 slice = 30° 
+ */
+.slice:first-child { -webkit-transform: rotate(-45deg) skewY(60deg); 	transform: rotate(-45deg) skewY(60deg); }
+.slice:nth-child(2) { -webkit-transform: rotate(-15deg) skewY(60deg); 	transform: rotate(-15deg) skewY(60deg); }
+.slice:nth-child(3) { -webkit-transform: rotate(15deg) skewY(60deg); 	transform: rotate(15deg) skewY(60deg); }
+.slice:nth-child(4) { -webkit-transform: rotate(45deg) skewY(60deg); 	transform: rotate(45deg) skewY(60deg); }
+.slice:last-child { -webkit-transform: rotate(75deg) skewY(60deg); 	transform: rotate(75deg) skewY(60deg); }
+/* covers for the inner part of the links so there's no hover trigger between
+   star button & menu links; give them a red background to see them */
+.slice:after {
+	position: absolute;
+	top: 32%; left: 32%;
+	width: 136%; height: 136%;
+	border-radius: 50%;
+	/* "unskew" = skew by minus the same angle by which parent was skewed */
+	-webkit-transform: skewY(-60deg);
+	transform: skewY(-60deg);
+	content: '';
+}
+/* menu links */
+.slice>span{
+  display:inline-block;
+	width: 210%; height: 210%;
+	border-radius: 50%;
+	box-shadow: 0 3px dimgrey, inset 0 0 8px white/*, inset 0px 25px 8px 8px rgba(0,255,0,0.2)*/;
+	/* "unskew" & rotate by -A°/2 */
+	-webkit-transform: skewY(-60deg) rotate(-15deg);
+	transform: skewY(-60deg) rotate(-15deg);
+	background: /* lateral separators */
+			linear-gradient(75deg, 
+		transparent 50%, grey 50%, transparent 54%) no-repeat 30% 0,
+			linear-gradient(-75deg, 
+		transparent 50%, grey 50%, transparent 54%) no-repeat 70% 0,
+		/* make sure inner part is transparent */
+		radial-gradient(rgba(127,127,127,0) 49%, 
+					rgba(255,255,255,.7) 51%, #c9c9c9 52%);
+	background-size: 20% 18%, 20% 18%, cover;
+	line-height: 1.4;
+}
+/* arrow for middle link 
+.slice:nth-child(3) a:after {
+	position: absolute;
+	top: 13%; left: 50%;
+	margin: -.25em;
+	width: .5em; height: .5em;
+	box-shadow: 2px 2px 2px white;
+	transform: rotate(45deg);
+	background: linear-gradient(-45deg, #c9c9c9 50%, transparent 50%);
+	content: '';
+}
+*/
+
+

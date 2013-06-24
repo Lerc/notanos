@@ -1,0 +1,14 @@
+{
+	"bundleType" : "bundle/webapp",
+    "icon" : "CKEditor-icon.png",
+	"exec" : {
+			"action" :"Open",
+			"main": "editor.html",
+			"contentType":"application/webapp",
+			"parameters" : {
+					"windowWidth" :930,
+					"windowHeight" :500,
+					"singleInstance" : true
+			  }
+			}
+}

@@ -1,4 +1,9 @@
 var DivWin = function () {
+	 var winIdCounter=1;
+	 function getNewWinId() {
+		 return winIdCounter++
+	 }
+	 
 	 var DivWin = {};
 	    var windowFrameWidth =0;
 	    var windowFrameHeight =0;
@@ -14,23 +19,37 @@ var DivWin = function () {
 						}
 				 }
 				win.element.dataset["stack"]=0;	
+				win.element.parentNode.dataset["top_window"]=win.element.dataset["window_id"];
+			}
+			
+			DivWin.focus = function(win) {				
+				DivWin.bringToFront(win);
+				var container = win.element.parentNode;
+				if (container.focusedWindow != win) {
+					  if (container.focusedWindow){
+						  container.focusedWindow.element.removeClass("focused");
+						}
+						container.focusedWindow=win;
+						win.element.addClass("focused");				
+						container.dataset["focused_window"]=win.element.dataset["window_id"]; 
+				}
 			}
 			function suggestPosition(x,y,w,h,centered) {
 				if (!w) w=400;
 				if (!h) h=200;
 				if (typeof(x) == 'undefined') { 
 					if (centered) {
-						x=Math.floor((screen.availWidth-w)/2);
+						x=Math.floor((window.innerWidth-w)/2);
 					} else {
-						var range=screen.availWidth-w-100;
+						var range=window.innerWidth-w-10;
 						x = Math.floor(Math.random()*range);
 					}
 				}
 				if (typeof(y) == 'undefined') { 
 					if (centered) {
-						y=Math.floor((screen.availHeight-h)/2);
+						y=Math.floor((window.innerHeight-h)/2);
 					} else {
-						var range=screen.availHeight-h-100;
+						var range=window.innerHeight-h-30;
 						y = Math.floor(Math.random()*range);
 					}
 				}
@@ -54,6 +73,8 @@ var DivWin = function () {
 				 var position=suggestPosition(left,top,width,height,centered);
 				 var result = {};
 				 var element =document.createElement("div");
+				 element.dataset["window_id"]=getNewWinId();
+				 element.dataset["stack"]=9999;
 				 result.element= element;
 				 element.className="miniwin frame";
 				 element.owner=result;	
@@ -81,7 +102,7 @@ var DivWin = function () {
 					result.decorations.bottomrightdragregion = hostdiv.appendNew("div","bottomrightframe dragregion");
 
 
-					hostdiv.addEventListener("mousedown",function (e){DivWin.bringToFront(e.currentTarget.owner);},true); 
+					hostdiv.addEventListener("mousedown",function (e){DivWin.focus(e.currentTarget.owner);},true); 
 					result.decorations.leftdragregion.addEventListener("mousedown",LeftEdgeMouseDown,true);
 					result.decorations.rightdragregion.addEventListener("mousedown",RightEdgeMouseDown,true);
 					result.decorations.topdragregion.addEventListener("mousedown",TopEdgeMouseDown,true);
@@ -98,7 +119,7 @@ var DivWin = function () {
 					windowFrameHeight = height - result.clientArea.clientHeight ;
 					windowFrameWidth = width - result.clientArea.clientWidth;
 					result.element.addClass("visible");
-					DivWin.bringToFront(result);
+					DivWin.focus(result);
 					return result;
 			}
 			

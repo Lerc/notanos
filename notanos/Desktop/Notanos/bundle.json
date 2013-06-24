@@ -1,0 +1,9 @@
+{
+	"bundleType" : "bundle/action",
+	"icon" : "user-home.svg",
+	"exec" : {
+			"action" : "Open",
+			"main" : "/",
+			"contentType":"directory"
+	}
+}

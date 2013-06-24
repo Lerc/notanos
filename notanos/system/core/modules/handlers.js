@@ -58,7 +58,7 @@
 				Handlers.installHandler(handlerDir[i].name);
 	 }	
 
-	 installHandler(makeAssociationHandler(['application/javascript','text/plain','text/html','text/css'],'/apps/CodeMirror/'));
+	 installHandler(makeAssociationHandler(['application/javascript','text/plain','text/html','text/css','application/json'],'/apps/CodeMirror'));
    return Handlers;
    
    
