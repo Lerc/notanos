@@ -1,21 +1,48 @@
 Notanos - Not really an operating system
 ========================================
 
-This is just a pile of Javascript pretending to be a desktop environment, but hosted from your phone?  Weird huh.
+This is just a pile of Javascript pretending to be a desktop environment, but hosted from your phone or Linux box?  Weird huh.
+It's Alpha stuff so don't expect too much yet...
 
 It looks a bit like this. 
 ![](https://raw.github.com/Lerc/notanos/master/screenshot.png)
 
-This is it serving from a Novo7 Aurora and clienting from WinXP Chrome[ http://www.youtube.com/watch?v=8028AwxF8_g ].  I am assured clienting is a real word.
+[This Youtube clip](http://www.youtube.com/watch?v=8028AwxF8_g) demonstrates Notanos serving from a Novo7 Aurora and clienting from WinXP Chrome.  I am assured clienting is a real word.
 
+[This clip](http://www.youtube.com/watch?v=6ADmVk0i0JI) shows it serving from a Linux box It even launches a bash terminal
 
-You can use it as a cloud in your pocket.
+You can use it as a cloud in your pocket or give your headless Linux box a HTML front end.
 
- * Decompress [notanos.tar.gz](https://github.com/downloads/Lerc/notanos/notanos.tar.gz) onto a path your Android device
- * Run [a simple server](https://play.google.com/store/apps/details?id=com.icecoldapps.webdavserverultimate&hl=en) on your Android Device to serve the decompressed directory
- * Find the ip:port where your desktop machine can see the server
- * Visit http://ip:port/index.html in your favourite web browser.
+Installation is moderately easy.  
+
+ * install [wsgidav](http://code.google.com/p/wsgidav/) with `easy_install -U wsgidav`
+ * Make a place to put Notanos.  
+   **note:** notanos will open a couple of ports (8009 & 13131) from which you can modify files.
+   I would recommend running Notanos from a new user account or from a virtual machine.
+ * Download and deecompress [notanos.tar.gz](http://fingswotidun.com/cruft/notanos.tar.gz) into your chosen location
+ * Download and decompress support binaries websocketd and numpty
+  [Arm version](http://fingswotidun.com/cruft/nossupportbin-arm.tar.gz) 
+  [i386 version](http://fingswotidun.com/cruft/nossupportbin-i386.tar.gz)
+ * Start the servers with `sh startnosserver.sh` 
+ * Find the ip:8009 where your desktop machine can see the server
+ * If on the same machine as the server open http://localhost:8009/index.html in your favourite web browser.
  
+For example: If you are running an i386 Ubuntu
+
+    sudo apt-get install python-setuptools
+    sudo easy_install -U wsgidav
+    sudo adduser somenewuser
+    sudo login somenewuser
+    
+    wget http://fingswotidun.com/cruft/notanos.tar.gz
+    tar -xzf notanos.tar.gz 
+    wget http://fingswotidun.com/cruft/nossupportbin-i386.tar.gz
+    tar -xzf nossupportbin-i386.tar.gz
+    sh startnosserver.sh
+
+The support binaries are, at present, only used by Termish.  You can run most of the system from any webdav server serving the notanos directory.
+
+
 What's good about it?
 ---------------------
  * Really easy to set up
@@ -42,5 +69,7 @@ It has the potential to be a full fledged interface to native applications.  Not
 
 Webdav is not the best tool for the job.  It's just what I could use now without writing any code.
 
-What it really needs is a server that is more specific to the unix file system.  Rather than using an XML PROPFIND request, a simplified model that returned JSON with the additional ability to support Websockets.  There is a lot of potential to using Websockets to facilitate a connection between server side applications and their Notanos interfaces.
+What it really needs is a server that is more specific to the unix file system.  Rather than using an XML PROPFIND request, a simplified model that returned JSON.  Even a server that sent the raw output of `ls -al` would be preferable to webdav's XML.
+
+There is a lot of potential to using Websockets to facilitate a connection between server side applications and their Notanos interfaces.
 
