@@ -1,0 +1,14 @@
+{
+	"bundleType" : "bundle/webapp",
+	"icon" : "terminal.svg",	
+	"exec" : {
+			"action" :"Open",
+			"main": "termish.html",
+			"contentType":"application/webapp",
+			"parameters" : {
+                    "title": "A terminal with poor ansi support",
+					"windowWidth" :660,
+					"windowHeight" :490
+			  }
+			}
+}
