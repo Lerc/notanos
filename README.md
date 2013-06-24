@@ -19,13 +19,13 @@ Installation is moderately easy.
  * Make a place to put Notanos.  
    **note:** notanos will open a couple of ports (8009 & 13131) from which you can modify files.
    I would recommend running Notanos from a new user account or from a virtual machine.
- * Download and deecompress [notanos.tar.gz](http://fingswotidun.com/cruft/notanos.tar.gz) into your chosen location
+ * Download and decompress [notanos.tar.gz](http://fingswotidun.com/cruft/notanos.tar.gz) into your chosen location
  * Download and decompress support binaries websocketd and numpty
   [Arm version](http://fingswotidun.com/cruft/nossupportbin-arm.tar.gz) 
   [i386 version](http://fingswotidun.com/cruft/nossupportbin-i386.tar.gz)
  * Start the servers with `sh startnosserver.sh` 
- * Find the ip:8009 where your desktop machine can see the server
- * If on the same machine as the server open http://localhost:8009/index.html in your favourite web browser.
+ * Find the ip number where your desktop machine can see the server
+ * If on the same machine as the server just open http://localhost:8009/index.html in your favourite web browser.
  
 For example: If you are running an i386 Ubuntu
 
