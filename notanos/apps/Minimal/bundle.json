@@ -1,0 +1,14 @@
+{
+	"bundleType" : "bundle/webapp",
+    "icon" : "rabbit.png",
+	"exec" : {
+			"action" :"Open",
+			"main": "HelloWorld.html",
+			"contentType":"application/webapp",
+			"parameters" : {
+                    "title": "Hello World",
+					"windowClientWidth" :130,
+					"windowClientHeight" :140
+			  }
+			}
+}

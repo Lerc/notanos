@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Hello World</title>
+		<meta charset="utf-8" />
+	</head>
+	<body>
+		<canvas id="c" width="100" height="110"></canvas>
+		<script>
+			var b = document.body;
+			var c = document.getElementsByTagName('canvas')[0];
+			var a = c.getContext('2d');
+			a.moveTo(35,30);
+           a.lineTo(15,28);
+           a.bezierCurveTo(15,0,35,0,35,30);
+           a.moveTo(75,30);
+           a.lineTo(95,28);
+           a.bezierCurveTo(95,0,75,0,75,30);
+           a.moveTo(100,80);
+           a.bezierCurveTo(100,130,10,90,10,80);
+           a.moveTo(50,50);
+           a.bezierCurveTo(25,80,85,80,60,50);
+           a.stroke();
+		</script>
+	</body>
+</html>
