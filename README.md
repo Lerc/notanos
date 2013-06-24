@@ -7,7 +7,8 @@ It's Alpha stuff so don't expect too much yet...
 It looks a bit like this. 
 ![](https://raw.github.com/Lerc/notanos/master/screenshot.png)
 
-[This Youtube clip](http://www.youtube.com/watch?v=6ADmVk0i0JI) demonstrates Notanos serving from a Linux box. It even launches a bash terminal
+[This Youtube clip](http://www.youtube.com/watch?v=6ADmVk0i0JI) demonstrates Notanos serving from a Linux box. It even launches a bash terminal.
+
 [This clip](http://www.youtube.com/watch?v=8028AwxF8_g) is (an older version) serving from a Novo7 Aurora (android-arm) and clienting from WinXP Chrome.  I am assured clienting is a real word.
 
 You can use it as a cloud in your pocket or give your headless Linux box a HTML front end.
