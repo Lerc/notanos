@@ -1,33 +1,76 @@
 (function() {
-  var Api = {name:"requesters" };
-  
-  Api.openFileDialog = function(parameters,responseCallback) { 
-    var currentDirectory="/";
-		var win = DivWin.createWindow({width:580, height:400, centered:true,title:"Open File"});
-		function requester_return(result) {
-			log("open dialog is returning "+result);
-			responseCallback(result);			
+  var API = new Module("requesters");
+
+  function fileDialog(filename,options,responseCallback) {  
+        var currentDirectory="/";
+        var title={"open":"Open File","save":"Save File"}[options.dialogKind];
+		var win = DivWin.createWindow({"width":580, "height":400, "centered":true,"title":title});
+		var base=sys.modules.fileItem.createItemContainer(win.clientArea,"list");
+   		function requester_return(result) {
+			log("dialog is returning "+result);
+			responseCallback(null,result);			
 			win.onClose=null;
 			DivWin.closeWindow(win)
 		}
-		var base=win.clientArea;
+
+		var fileView=base.querySelector(".fileview");
 		base.addClass("requester");
-		base.addClass("fileopen");
+		base.defaultHandler=defaultHandler;
 		var locationbar=base.appendNew("div","locationbar");
-		var fileView=base.appendNew("ul","fileview list");
 		var pathBar=base.appendNew("ol","pathbar");
-		var fileName=base.appendNew("div","filename").appendNew("input");
+		var fileName=base.appendNew("div","filename").appendNew("input","userinput");
 		fileName.type="text";
 		var filetype=base.appendNew("div","filetype button").appendNew("select");
-    var openButton=base.appendNew("div","open button");
-    var cancelButton=base.appendNew("div","cancel button"); 
-    var backButton=base.appendNew("div","back button"); 
-    var upButton=base.appendNew("div","up button"); 
-		openButton.addEventListener("click",function() {requester_return(currentDirectory+fileName.value)});
+        var openButton,savebutton;
+        var cancelButton=base.appendNew("div","cancel button"); 
+        var backButton=base.appendNew("div","back button"); 
+        var upButton=base.appendNew("div","up button"); 
+        
+        if (options.dialogKind==="open"){
+    		//base.addClass("fileopen");
+            openButton=base.appendNew("div","open button");
+            openButton.addEventListener("click",openButtonClick);
+
+        }
+        if (options.dialogKind==="save") {
+            //base.addClass("filesave");
+            saveButton=base.appendNew("div","save button");
+            saveButton.addEventListener("click",saveButtonClick);
+        }
+        
 		cancelButton.addEventListener("click",function() {requester_return(null)});
-		win.onClose = function () {responseCallback(null)};
-		
+		win.onClose = function () {responseCallback("cancelled")};
+	
+    function openButtonClick() {        
+        requester_return(currentDirectory+fileName.value)
+    }
+    
+    function saveButtonClick() {
+        var savename = currentDirectory+fileName.value;
+        FileIO.exists(savename,function(itdoes) {
+            var saveit=true;
+            if (itdoes & (options.overwriteQuery===true)) {
+                saveit=window.confirm("File exists,  OK to overWrite?");
+            }
+            if (saveit) requester_return(savename)
+        });
+    }
+    function defaultHandler(e) {
+        var p=e.currentTarget.parentNode.parentNode; 
+        if (e.currentTarget.dataset["contentclass"]==="directory") {
+			if (p.setContainerViewpoint) {
+				log("doubleClick "+ e.currentTarget.dataset["filename"]);
+				p.setContainerViewpoint(e.currentTarget.dataset["filename"]);
+			}
+		} else {
+            console.log("dialog says to open ",e.currentTarget.dataset["filename"]);
+            requester_return(e.currentTarget.dataset["filename"])
+        }
+    }
+    
     function setFileViewPath(path) {
+			base.setContainerViewpoint(path);
+			/*
 			var dir=WebDav.getDirectoryListing(path);
 			fileView.clear();
 
@@ -51,6 +94,7 @@
 				li.addEventListener("dblclick",doubleClick,true);
 				li.addEventListener("click",click,false);
 				li.setAttribute("draggable","true");
+				
 			}	
 
 			function click(e) {
@@ -66,6 +110,7 @@
 					requester_return(e.currentTarget.dataset["filename"]);
 				}
 			}	
+			*/ 
 		}
 		
     function setCurrentDirectory(newPath) {
@@ -90,7 +135,21 @@
 			setFileViewPath(currentDirectory);
 		}
 		
-    setCurrentDirectory ("/system/core/modules/");
+    setCurrentDirectory(sys.dir);
   }
-  return Api;
+
+  API.openFileDialog = function(filename,options,responseCallback) { 
+    if (!options) options={};
+    options.dialogKind="open";
+    fileDialog(filename,options,responseCallback);
+  }  
+  
+  API.saveFileDialog = function(filename,options,responseCallback) {
+    if (!options) options={};
+    options.dialogKind="save";
+    options.overwriteQuery=true;
+    fileDialog(filename,options,responseCallback);      
+  }
+  
+  return API;
 }());

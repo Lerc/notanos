@@ -1,5 +1,5 @@
 (function() {
-	var Module = {name:"contextMenus" };
+	var API = new Module("contextMenus") ;
 	default_images=[
 		"system/data/icons/default/actions/bundle-1.png",
 		"system/data/icons/default/actions/bundle-2.png",
@@ -24,13 +24,15 @@
 			center.addEventListener("transitionend",killMenu);
 			center.addClass("hidden");		
 		}
-	  function overlayMouseDown(e) {
-			
-			if (e.target.className!=="arcmenuitem") {
-				closeMenu();
-			}
+	    function overlayMouseDown(e) {	
+             closeMenu();
 		}
+        function stopEventPropagation(e) {
+            e.stopPropagation();
+        }
+        
 		function reportClick(e) {
+            console.log("click ",+e.target);
 			log("click "+e.target.textContent);
 			closeMenu();
 			if (callback) callback(e);
@@ -39,14 +41,15 @@
 			var item=menu.appendNew("li","slice");
 			var content=item.appendNew("span","arcmenuitem");
 			content.innerHTML='<img src="'+default_images[i]+'">';
-			content.addEventListener("click",reportClick);
+			content.addEventListener("mousedown",stopEventPropagation);
+            content.addEventListener("click",reportClick);
 			content.dataset["action"]=default_actions[i];
 		}
 		result.addEventListener("mousedown",overlayMouseDown);
 		return result;
 	}
 	
-	Module.attachArcMenu = function(element,callback) {
+	API.attachArcMenu = function(element,callback) {
 		 var overlay = makeArcMenu(callback);
 		 var bounds=element.getBoundingClientRect();
 		 var menu=overlay.querySelector(".arcmenu")
@@ -60,5 +63,5 @@
 		 menu.removeClass("hidden");
 	}
 	
-  return Module;
+  return API;
 }());

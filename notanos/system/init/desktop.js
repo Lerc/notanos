@@ -1,7 +1,7 @@
 //this is mostly just a crude copy of dumbdirectoryview (itself a crude viewer)
 //hacked together to get a desktop quickly;
 var workSpace=document.body;
-var desktopDirectoryName="/Desktop";
+var desktopDirectoryName=sys.dir+"/Desktop";
 var desktop=sys.modules.fileItem.createItemContainer();
 desktop.addClass("desktop");
 workSpace.appendChild(desktop);

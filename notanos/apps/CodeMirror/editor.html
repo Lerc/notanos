@@ -50,12 +50,14 @@
 
 </div>
 <script>
+    actions={};
+    actions.quit = function( ) {ClientFrame.exit();}  
     var pagenum=123;
       var activePage = document.querySelector("#pager>div");
       var pageTabs = document.querySelector("#pager>.pagetabs");
       
       function menuOpen() {
-        ClientFrame.openFileDialog("/",function(result){
+        ClientFrame.openFileDialog("/",function(err,result){
           //alert("open " + result);
           if (result) { addEditor(result) };
         });
@@ -99,6 +101,7 @@
           activePage=newPage;
           activePage.style.visibility="visible";      
           activePage.editor.focus();
+          ClientFrame.setWindowTitle(activePage.editor.fileName);
       }
       
       function pagerClick(e) {
@@ -118,8 +121,25 @@
         editor.tab.dataset["modified"]=editor.modified;  
       }
       
+      function saveAs(editor) {
+        ClientFrame.saveFileDialog("/home/",function (err,result) {
+            if (result) {
+                editor.fileName=result;
+                ClientFrame.saveFile(editor.fileName,editor.getValue());
+                editor.modified=false;
+                editor.tab.dataset["modified"]=editor.modified;                  
+                editor.tab.textContent=result.split('/').pop();
+                editor.setOption("mode",pickType(name));
+            }
+        });            
+      }
+      
       function save(editor) {
         if(!editor) editor=activePage.editor;
+        if (typeof editor.fileName === 'undefined') {
+            saveAs(editor);        
+            return;
+        }            
         ClientFrame.saveFile(editor.fileName,editor.getValue());
         editor.modified=false;
         editor.tab.dataset["modified"]=editor.modified;  
@@ -128,7 +148,7 @@
         if (!name) return "text-plain";
         var extension=name.split('.').pop();
         switch (extension) {
-        
+        case "whio":
         case "js":
         case "json": return "text/javascript";
         case "html":
@@ -166,7 +186,6 @@
 			li.textContent="untitled";
 		} else {
              li.textContent=name.split('/').pop();
-             
              editorDiv.editor.setOption("mode",pickType(name));
             }
 
@@ -181,7 +200,7 @@
             if ((!activePage.editor.fileName) && (activePage.editor.modified==false)) {
               closePage();
             }
-            ClientFrame.loadFile(name,createEditor);            
+            ClientFrame.loadFile(name,function (err,content){createEditor(content);});            
         }
       }
         
@@ -226,7 +245,12 @@
        var menu = document.querySelector("ul.menubar");
        menu.addEventListener("click",function (e) {
           var cmd=e.target.dataset["clickaction"]
-          if (cmd) {alert(cmd);  }});
+          if (cmd) {
+            var action=actions[cmd];
+            if (action) action();
+            //alert(cmd);  
+          }
+        });
        
        ClientFrame.onActionNotify=function(action) {
           if (action.actionKind=="Open") {

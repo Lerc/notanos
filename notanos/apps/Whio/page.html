@@ -1,0 +1,43 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<title>A program</title>
+    <script src="clientframe.js"></script>
+	<notscript src="program.js"></notscript>
+    <style>
+      body {overflow:hidden}
+    </style>
+</head>
+<body onload="">
+    <div></div>
+	<script src="whio.js"></script>
+    <script> 
+     var running=false;
+     ClientFrame.onActionNotify=function(action) {
+        console.log("action notify",action);
+        if (action.actionKind=="Launch") {
+            runProgram()
+        } else {
+         if (action.actionKind=="Open") {
+            runProgram(action.fileName);
+          }
+        }
+    }
+       
+    function runProgram(filename) {
+        if (running===true) return
+        if (!filename) filename="/home/lerc/Notanos/apps/Whio/program.js";
+        
+        ClientFrame.loadFile(filename,function(err,result) {
+                document.body.focus();
+
+            if(!err)  eval(result);
+            running=true;
+        });
+    }
+    </script>    
+
+</body>
+</html>
+
+  

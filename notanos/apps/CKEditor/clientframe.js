@@ -103,6 +103,10 @@ var ClientFrame = function () {
     API.openFileDialog=function(initialFileName,callback) {
        API.postFunctionCall("openFileDialog",{"initialFileName":initialFileName},callback);
     }
-    
+
+    API.setWindowTitle=function(text,callback) {
+       API.postFunctionCall("setWindowTitle",{"text":text},callback);
+    }
+
     return API; 
 } ();

@@ -22,6 +22,159 @@ var Utility = function () {
 		}
 		return spanify(value);
 	}
-	
+
+    /* UTF-8 array to DOMString and vice versa */
+    // from  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Base64_encoding_and_decoding
+    Api.UTF8ArrToStr =function(aBytes) {
+        var sView = "";
+
+        for (var nPart, nLen = aBytes.length, nIdx = 0; nIdx < nLen; nIdx++) {
+            nPart = aBytes[nIdx];
+            sView += String.fromCharCode(
+              nPart > 251 && nPart < 254 && nIdx + 5 < nLen ? /* six bytes */
+                /* (nPart - 252 << 32) is not possible in ECMAScript! So...: */
+                (nPart - 252) * 1073741824 + (aBytes[++nIdx] - 128 << 24) + (aBytes[++nIdx] - 128 << 18) + (aBytes[++nIdx] - 128 << 12) + (aBytes[++nIdx] - 128 << 6) + aBytes[++nIdx] - 128
+              : nPart > 247 && nPart < 252 && nIdx + 4 < nLen ? /* five bytes */
+                (nPart - 248 << 24) + (aBytes[++nIdx] - 128 << 18) + (aBytes[++nIdx] - 128 << 12) + (aBytes[++nIdx] - 128 << 6) + aBytes[++nIdx] - 128
+              : nPart > 239 && nPart < 248 && nIdx + 3 < nLen ? /* four bytes */
+                (nPart - 240 << 18) + (aBytes[++nIdx] - 128 << 12) + (aBytes[++nIdx] - 128 << 6) + aBytes[++nIdx] - 128
+              : nPart > 223 && nPart < 240 && nIdx + 2 < nLen ? /* three bytes */
+                (nPart - 224 << 12) + (aBytes[++nIdx] - 128 << 6) + aBytes[++nIdx] - 128
+              : nPart > 191 && nPart < 224 && nIdx + 1 < nLen ? /* two bytes */
+                (nPart - 192 << 6) + aBytes[++nIdx] - 128
+              : /* nPart < 127 ? */ /* one byte */
+                nPart
+            );
+          }
+
+        return sView;
+    }
+
+    Api.strToUTF8Arr=function(sDOMStr) {
+
+      var aBytes, nChr, nStrLen = sDOMStr.length, nArrLen = 0;
+
+      /* mapping... */
+
+      for (var nMapIdx = 0; nMapIdx < nStrLen; nMapIdx++) {
+        nChr = sDOMStr.charCodeAt(nMapIdx);
+        nArrLen += nChr < 0x80 ? 1 : nChr < 0x800 ? 2 : nChr < 0x10000 ? 3 : nChr < 0x200000 ? 4 : nChr < 0x4000000 ? 5 : 6;
+      }
+
+      aBytes = new Uint8Array(nArrLen);
+
+      /* transcription... */
+
+      for (var nIdx = 0, nChrIdx = 0; nIdx < nArrLen; nChrIdx++) {
+        nChr = sDOMStr.charCodeAt(nChrIdx);
+        if (nChr < 128) {
+          /* one byte */
+          aBytes[nIdx++] = nChr;
+        } else if (nChr < 0x800) {
+          /* two bytes */
+          aBytes[nIdx++] = 192 + (nChr >>> 6);
+          aBytes[nIdx++] = 128 + (nChr & 63);
+        } else if (nChr < 0x10000) {
+          /* three bytes */
+          aBytes[nIdx++] = 224 + (nChr >>> 12);
+          aBytes[nIdx++] = 128 + (nChr >>> 6 & 63);
+          aBytes[nIdx++] = 128 + (nChr & 63);
+        } else if (nChr < 0x200000) {
+          /* four bytes */
+          aBytes[nIdx++] = 240 + (nChr >>> 18);
+          aBytes[nIdx++] = 128 + (nChr >>> 12 & 63);
+          aBytes[nIdx++] = 128 + (nChr >>> 6 & 63);
+          aBytes[nIdx++] = 128 + (nChr & 63);
+        } else if (nChr < 0x4000000) {
+          /* five bytes */
+          aBytes[nIdx++] = 248 + (nChr >>> 24);
+          aBytes[nIdx++] = 128 + (nChr >>> 18 & 63);
+          aBytes[nIdx++] = 128 + (nChr >>> 12 & 63);
+          aBytes[nIdx++] = 128 + (nChr >>> 6 & 63);
+          aBytes[nIdx++] = 128 + (nChr & 63);
+        } else /* if (nChr <= 0x7fffffff) */ {
+          /* six bytes */
+          aBytes[nIdx++] = 252 + /* (nChr >>> 32) is not possible in ECMAScript! So...: */ (nChr / 1073741824);
+          aBytes[nIdx++] = 128 + (nChr >>> 24 & 63);
+          aBytes[nIdx++] = 128 + (nChr >>> 18 & 63);
+          aBytes[nIdx++] = 128 + (nChr >>> 12 & 63);
+          aBytes[nIdx++] = 128 + (nChr >>> 6 & 63);
+          aBytes[nIdx++] = 128 + (nChr & 63);
+        }
+      }
+
+      return aBytes;
+
+    }
 	return Api;
 }();
+
+var FifoBuffer = function () {
+
+    function FifoBuffer() {
+        this.length=0;
+        this.head=0;
+        this.tail=0;
+        this.granularity=16384;
+        this.advance=1024;
+        this.bytes=new Uint8Array(0);
+    };
+
+    
+    FifoBuffer.prototype.clear = function() {
+        this.length=0;
+        this.head=0;
+        this.tail=0;
+    }
+    
+    FifoBuffer.prototype.add = function(data) {
+        var newData=new Uint8Array(data);
+        var requiredLength=this.head+newData.byteLength;
+        if (requiredLength > this.bytes.length) {
+            var newSize=this.tail+this.length+newData.byteLength+this.advance;            
+            newSize=Math.ceil(newSize/this.granularity)*this.granularity;
+            var newBuffer=new Uint8Array(newSize);
+            var existingData=this.bytes.subarray(this.tail,this.length);
+            newBuffer.set(existingData);
+            newBuffer.set(newData,this.length);
+            this.length+=newData.byteLength;
+            this.tail=0;
+            this.head=this.length;
+            this.bytes=newBuffer;
+        } else {
+            this.bytes.set(newData,this.head);
+            this.head+=newData.length;
+            this.length+=newData.length;
+        }
+    }
+    
+    FifoBuffer.prototype.disposeBytes = function(dataLength) {
+        this.tail+=dataLength;
+        this.length-=dataLength;
+        if ( (this.length<0) || ( (this.head-this.tail) != this.length) ) {
+            throw new Error("FifoBuffer underrun");
+        }
+        if (this.length===0) {
+          this.head=0;
+          this.tail=0;
+        }
+    }
+
+    FifoBuffer.prototype.peek = function (maxLength) {
+        if (!maxLength) maxlength=this.length;
+        var resultLength = Math.min(maxLength,this.length);
+        return this.bytes.subarray(this.tail,resultLength);
+    }
+    
+    FifoBuffer.prototype.find = function (value) {
+      for (var i=this.tail; i<this.head; i++) {
+        if (this.bytes[i]==value) return (i-this.tail)
+      }
+      return -1;
+    }
+    
+    return FifoBuffer;
+
+}();
+
+

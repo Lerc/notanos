@@ -1,0 +1,30 @@
+
+for (var i=0;i<10;i++) {
+  var j=10-i;
+  setColour("Blue");
+  drawLine(i*64,i*48,i*64,j*48);
+  setColour("Green");
+  drawLine(j*64,j*48,i*64,j*48);
+}
+makeBackground();
+
+var x=100;
+var y=100;
+var dx=1;
+var dy=2;
+
+function move() {
+  x+=dx;
+  y+=dy;
+}
+
+function draw() {
+  clear();
+  setColour("Black");
+
+  fillCircle(x,y,10);
+  
+  print(x);
+}
+
+run(move,draw);

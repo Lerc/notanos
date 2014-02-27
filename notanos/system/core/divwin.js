@@ -89,9 +89,10 @@ var DivWin = function () {
 				  result.decorations={};
 				  var hostdiv=element;
 				  result.decorations.titleBar=hostdiv.appendNew("div","titlebar");
-				  result.decorations.titleBar.innerHTML=title;
+                  result.decorations.caption=result.decorations.titleBar.appendNew("div","caption");
+				  result.decorations.caption.innerHTML=title;
 				  result.clientArea = hostdiv.appendNew("div","clientarea");
-				  result.decorations.closeButton=result.decorations.titleBar.appendNew("div","closebutton");
+				  result.decorations.closeButton=result.decorations.titleBar.appendNew("div","closebutton widget");
 					//result.decorations.titlebar
 					
 					result.decorations.leftdragregion = hostdiv.appendNew("div","leftframe dragregion");
@@ -207,8 +208,9 @@ var DivWin = function () {
        return false;
     }
     function TitleBarMouseDown(e) {
-       if (e.target != e.currentTarget) return;
-			 var hostdiv=e.currentTarget.parentNode;
+        
+       if (e.target.hasClass("widget")) return;
+		var hostdiv=e.currentTarget.parentNode;
         var localx=e.clientX-hostdiv.offsetLeft;
         var localy=e.clientY-hostdiv.offsetTop;
         enableEventCaptureOverlay();

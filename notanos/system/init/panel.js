@@ -37,7 +37,7 @@ function considerTaskBar() {
 		var image=item.appendNew("img","icon");		
 		caption.textContent=titleBar.textContent;
 		item.relatedWindow=w.owner;
-		image.src=w.iconImage || "/system/data/icons/default/categories/generic-window.svg";
+		image.src=w.iconImage || "system/data/icons/default/categories/generic-window.svg";
 		item.addEventListener("click",taskBarItemClick,false);
 	};
 	

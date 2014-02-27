@@ -1,0 +1,14 @@
+{
+	"bundleType" : "bundle/webapp",
+    "icon" : "whio_logo.png",
+	"exec" : {
+			"action" :"Open",
+			"main": "page.html",
+			"contentType":"application/webapp",
+			"parameters" : {
+                    "title": "Whio",
+					"windowClientWidth" :660,
+					"windowClientHeight" :500
+			  }
+			}
+}

@@ -41,6 +41,7 @@
 									frame.win=win;
 									frame.original_name=name;
 									frame.onload=function() {
+                                        if (!execMessage.parameters.action) execMessage.parameters.action={actionKind:"Launch"};
 										log("sending a message to frame");
 										var message = JSON.stringify(execMessage);
 										log(message);

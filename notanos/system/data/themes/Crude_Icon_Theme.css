@@ -1,0 +1,39 @@
+ul.fileview > li>.image {
+  background-image: url('icons/default/mimetypes/unknown.svg');
+}
+
+ul.fileview > li[data-contentclass='text']>.image {
+  background-image: url('icons/default/mimetypes/text.svg');
+}
+
+ul.fileview > li[data-contentclass='directory']>.image {
+  background-image: url('icons/default/mimetypes/directory.svg');
+}
+
+ul.fileview > li[data-contentclass='image']>.image {
+  background-image: url('icons/default/mimetypes/image.svg');
+}
+
+ul.fileview > li[data-contenttype='application/whio']>.image {
+  background-image: url('icons/default/mimetypes/whio_logo.png');
+}
+
+ul.fileview > li[data-contenttype='image/svg+xml']>.image {
+  background-image: url('icons/default/mimetypes/image-svg+xml.svg');
+}
+
+ul.fileview > li[data-contenttype='application/javascript']>.image {
+  background-image: url('icons/default/mimetypes/application-javascript.svg');
+}
+
+ul.fileview > li[data-contenttype='application/json']>.image {
+  background-image: url('icons/default/mimetypes/application-json.svg');
+}
+
+ul.fileview > li[data-contenttype='directory/bundle']>.image {
+  background-image: url('icons/default/categories/applications-other.svg');
+}
+
+ul.fileview > li[data-contenttype='directory/bundle']>.image[data-bundleicon]{
+
+}
