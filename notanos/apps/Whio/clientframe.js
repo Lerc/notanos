@@ -3,6 +3,11 @@ var ClientFrame = function () {
     var parentOrigin= loc.protocol+'//'+loc.hostname+(loc.port ? ':'+loc.port: '');
     var API = {}
 
+    API.framePath=function() {
+        var path=window.location.pathname;
+        return path.substring(0,path.lastIndexOf("/"));
+    }
+
     function is_empty(obj) {
         // Assume if it has a length property with a non-zero value
         // that that property is correct.
@@ -15,7 +20,7 @@ var ClientFrame = function () {
         }
         return true;
     }
-    
+   
     var messageHandlers = {};
     addEventListener("message",handleMessage,false);
     function handleMessage(e) {

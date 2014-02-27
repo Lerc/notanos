@@ -26,8 +26,8 @@
        
     function runProgram(filename) {
         if (running===true) return
-        if (!filename) filename="/home/lerc/Notanos/apps/Whio/program.js";
-        
+        if (!filename) filename=ClientFrame.framePath()+"/program.js";
+        console.log("filename is ",filename);
         ClientFrame.loadFile(filename,function(err,result) {
                 document.body.focus();
 
