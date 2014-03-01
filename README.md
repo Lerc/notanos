@@ -7,58 +7,56 @@ It's Alpha stuff so don't expect too much yet...
 It looks a bit like this. 
 ![](https://raw.github.com/Lerc/notanos/master/screenshot.png)
 
+[Latest Clip](http://www.youtube.com/watch?v=oHwNxDWwuY4) 
+This is the new userserv hosted notanos running on a CubieBoard2. I talk through what I'm doing,  The video shows some features of the bridge to the 
+host machine as well as a paint program coded from scratch at record time.
+
 [This Youtube clip](http://www.youtube.com/watch?v=6ADmVk0i0JI) demonstrates Notanos serving from a Linux box. It even launches a bash terminal.
 
 [This clip](http://www.youtube.com/watch?v=8028AwxF8_g) is (an older version) serving from a Novo7 Aurora (android-arm) and clienting from WinXP Chrome.  I am assured clienting is a real word.
 
 You can use it as a cloud in your pocket or give your headless Linux box a HTML front end.
 
-Installation is moderately easy.  
+Installation was moderately easy,  then it got harder (sorry)
 
- * install [wsgidav](http://code.google.com/p/wsgidav/) with `easy_install -U wsgidav`
- * Make a place to put Notanos.  
-   **note:** notanos will open a couple of ports (8009 & 13131) from which you can modify files.
-   I would recommend running Notanos from a new user account or from a virtual machine.
- * Download and decompress [notanos.tar.gz](http://fingswotidun.com/cruft/notanos.tar.gz) into your chosen location
- * Download and decompress support binaries websocketd and numpty
-  [Arm version](http://fingswotidun.com/cruft/nossupportbin-arm.tar.gz) 
-  [i386 version](http://fingswotidun.com/cruft/nossupportbin-i386.tar.gz)
- * Start the servers with `sh startnosserver.sh` 
- * Find the ip number where your desktop machine can see the server
- * If on the same machine as the server just open http://localhost:8009/index.html in your favourite web browser.
+  You need to have Node.js v0.10 or better.   For the CubieBoad I just grabbed the Raspberry-pi binaries from http://nodejs.org/dist/v0.10.24/
  
-For example: If you are running an i386 Ubuntu
-
-    sudo apt-get install python-setuptools
-    sudo easy_install -U wsgidav
-    sudo adduser somenewuser
-    sudo login somenewuser
+  You also need [userserv](https://github.com/Lerc/userserv)
+  Follow the instructions on the userserv page to build and install  ( it's just  git clone; make all; make install)
     
     wget http://fingswotidun.com/cruft/notanos.tar.gz
-    tar -xzf notanos.tar.gz 
-    wget http://fingswotidun.com/cruft/nossupportbin-i386.tar.gz
-    tar -xzf nossupportbin-i386.tar.gz
-    sh startnosserver.sh
+    tar -xzf notanos.tar.gz
+    ln -s notanos/notanos ~/Notanos
+    
+To run the server (with Notanos features enabled)
+    userserv -n
+ 
+Then from a browser.
+    https://machinename-or-ip 
 
-The support binaries are, at present, only used by Termish.  You can run most of the system from any webdav server serving the notanos directory.
+Once logged in go to     https://machinename-or-ip/~/Notanos/index.html
 
 
 What's good about it?
 ---------------------
- * Really easy to set up
  * Making apps is can be as easy as making a webpage that runs in a frame
  * Supports App bundles (any directory containing a bundle.json)
  * Apps do not _have_ to be HTML Frames.  Other app types can be defined by providing a module to run them.
- 
+ * Linux side processes can open a connection to the browser session, via a unix-domain socket tunneling over a websocket connection
+ * Linux side processes can send their own frame to the browser and then communicate in whatever protocol they program the frame to support.
+ * Browser side programs can execute linux side processes.  The environment variable $WEBSESSION is set to the name of the unix-domain socket for the session,.
+ * Comes with the tiniest game of pacman in the world (Written in DCPU-16 assembler!)
  
 What's bad about it?
 --------------------
- * The server is just a dumb WebDav implementation.
- * Hardly any security.
- * No symlinks
+ * <del>The server is just a dumb WebDav implementation.</del>  (now uses userserv)
+ * <del>Hardly any security. </del> (now goes over https and requires login)
+ * <del>No symlinks</del>  Dumping webdav fixed this.
+ * has a root level component that hasn't had many eyes look at it yet.
  * Much of the code is written to support the bare essentials and not much else.
  * Even then a bunch of it is probably broken.
- * It's not finished, OK?
+ * It's not finished, OK? (but is is much better than it was a year ago)
+ * The terminal got worse in this version & I broke CKEditor again.
  
 What could it be?
 -----------------
@@ -67,9 +65,6 @@ Notanos could be very quickly extended to support a lot of existing HTML5/JS web
 
 It has the potential to be a full fledged interface to native applications.  Notanos would be acting in a role slightly similar to X11 in that respect.  This would be moving beyond Android and treating the system as the underlying Linux box that it really is.
 
-Webdav is not the best tool for the job.  It's just what I could use now without writing any code.
-
-What it really needs is a server that is more specific to the unix file system.  Rather than using an XML PROPFIND request, a simplified model that returned JSON.  Even a server that sent the raw output of `ls -al` would be preferable to webdav's XML.
-
 There is a lot of potential to using Websockets to facilitate a connection between server side applications and their Notanos interfaces.
 
+Notanos is getting to the point where it might be feasable for people to hack around with it and try and get it to do things.  
