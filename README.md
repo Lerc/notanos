@@ -26,7 +26,7 @@ Installation was moderately easy,  then it got harder (sorry)
     
     wget http://fingswotidun.com/cruft/notanos.tar.gz
     tar -xzf notanos.tar.gz
-    ln -s notanos/notanos ~/Notanos
+    ln -sr notanos ~/Notanos
     
 To run the server (with Notanos features enabled)
     userserv -n
