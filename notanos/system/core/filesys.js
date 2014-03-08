@@ -983,15 +983,20 @@ var FileIO = (function (){
 	"smv": "video/x-smv",
 	"ice": "x-conference/x-cooltalk"
     }
-    var API = {};
+  
+    var API = CustomEvents.makeEventEmitter();
     
     function succeed(callback,result) {
-      callback(null,result);
+      if (Object.isFunction(callback) ) {
+        callback(null,result);
+      }
     }
     
     function fail(callback,error) {
       console.log("failure of something ",error);
-      callback(new Error(error));
+      if (Object.isFunction(callback) ) {
+        callback(new Error(error));
+      }
     }
     
     
@@ -1034,6 +1039,7 @@ var FileIO = (function (){
     function requestFile(url,type,callback) {
        //console.log("requestFile("+url+")");
 
+        if (url[0]=="~") url="/"+url;
         var request = new XMLHttpRequest();
         request.responseType=type;
         request.overrideMimeType("application/octet-stream");
@@ -1062,6 +1068,10 @@ var FileIO = (function (){
     API.writeFile = function (name,data,callback) {
        fail(callback,"not implemented");
     }
+
+    API.stat = function (name,data,callback) {
+       fail(callback,"not implemented");
+    }
     
     API.getFileInfo = function (name,callback) {
        console.log("getFileInfo",name);
@@ -1082,8 +1092,32 @@ var FileIO = (function (){
        });
     }
     
+    function normalise(path) {
+      if (path[0]=="~") path=sys.environment.HOME+'/'+path.from(1);
+      var parts=path.split("/");
+      var result=[];
+      for (var i=0; i< parts.length;i++) {
+        var part=parts[i];
+        switch (part) {
+            case "..": 
+                result.pop();
+                break;
+            case ".","": 
+                break;
+            default:
+                result.push(part);
+        }                
+      }
+      return path[0]=='/'?'/'+result.join('/'):result.join('/');
+    }
+    
+    API.normalisePath=normalise;
+    API.normalizePath=normalise;
+    
    	API.arePathsEquivalent = function (patha,pathb) 	{
-		return patha==pathb;
+        var a=normalise(patha);
+        var b=normalise(pathb);
+		return a===b;
 	}
 
     function getDirectory (name,callback) {

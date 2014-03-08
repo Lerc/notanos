@@ -2,6 +2,7 @@
 	var API = new Module("processFrame");
     
     function reportConnection(connection) {
+        log("process frame started");
         var win=DivWin.createWindow(700,200,640,480,"A process");
         win.connection=connection;
 		var frameOverlay=win.clientArea.appendNew("div","fillparent frameoverlay");
@@ -21,7 +22,8 @@
             frame.contentWindow.postMessage({"messageType" : "hostmessage", "data" : content},"*");
             
         }   
-
+        
+        win.on("close", function() { connection.close()});
         connection.on("close",function(){
             DivWin.closeWindow(win)
         });

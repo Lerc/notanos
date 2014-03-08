@@ -3,7 +3,7 @@
 	"icon" : "user-home.svg",
 	"exec" : {
 			"action" : "Open",
-			"main" : "/~/Notanos",
+			"main" : "~/Notanos",
 			"contentType":"directory"
 	}
 }

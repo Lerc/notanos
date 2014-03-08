@@ -6,10 +6,13 @@
 		"Open" : {
 			description : "look at it (Duh)",
 			act : function(name) {
-								var text=WebDav.getData(name);
-				        var win=DivWin.createWindow(500,100,500,700,name);
+              FileIO.getFileAsString(name,function(err,text) { 
+                  if (!err) {
+				      	var win=DivWin.createWindow(500,100,500,700,name);
 				        win.clientArea.appendNew("textarea","fillparent").textContent=text;
-							}
+                  }
+				});
+              }
 			}
 		}	
 });

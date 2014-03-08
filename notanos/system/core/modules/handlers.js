@@ -14,7 +14,7 @@
 		result.actions= { };
 		result.actions[actionKind] = { "description" : actionKind };
 		result.actions[actionKind].act = (function (name) {
-			var parameters = {action : {"actionKind":targetActionKind,  "fileName":name}};
+			var parameters = {action : {"actionKind":targetActionKind,  "filename":name}};
 			API.performAction(targetActionKind,associatedItem,parameters);
 		});
 		return result;

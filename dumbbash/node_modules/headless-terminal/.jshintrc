@@ -1,0 +1,28 @@
+{
+  "bitwise": false
+, "noarg": true
+, "undef": true
+, "trailing": true
+, "asi": true
+, "eqnull": true
+, "laxcomma": true
+, "laxbreak": true
+, "browser": true
+, "jquery": true
+, "node": true
+, "strict": false
+, "es5": true
+, "maxparams": 4
+, "maxdepth": 4
+, "maxstatements": 15
+, "maxcomplexity": 6
+, "globals": {
+    "it": false,
+    "describe": false,
+    "beforeEach": false,
+    "chai": false,
+    "context": false,
+    "sinon": false,
+    "expect": true
+  }
+}

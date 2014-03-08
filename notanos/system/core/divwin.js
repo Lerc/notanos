@@ -26,9 +26,11 @@ var DivWin = function () {
 				DivWin.bringToFront(win);
 				var container = win.element.parentNode;
 				if (container.focusedWindow != win) {
+                    win.signal("focus");
 					  if (container.focusedWindow){
+                          container.focusedWindow.signal("blur");
 						  container.focusedWindow.element.removeClass("focused");
-						}
+                      }
 						container.focusedWindow=win;
 						win.element.addClass("focused");				
 						container.dataset["focused_window"]=win.element.dataset["window_id"]; 
@@ -71,7 +73,7 @@ var DivWin = function () {
 					 if (parameters.clientHeight) {height=parameters.clientHeight+windowFrameHeight}
 				 } 
 				 var position=suggestPosition(left,top,width,height,centered);
-				 var result = {};
+				 var result = CustomEvents.makeEventEmitter();
 				 var element =document.createElement("div");
 				 element.dataset["window_id"]=getNewWinId();
 				 element.dataset["stack"]=9999;
@@ -126,6 +128,7 @@ var DivWin = function () {
 			
 	  DivWin.closeWindow = function(win) {
 		  win.element.parentNode.removeChild(win.element);
+          win.signal("close");
 		  if (win.onClose) (win.onClose());
 	 }
 	 

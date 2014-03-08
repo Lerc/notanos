@@ -5,6 +5,9 @@
     
     var waitingCallbacks = {};
     
+    var ready=false;
+    API.isReady = function(){return ready===true}
+    
     function handleHostData(content) {
         host.buffer.add(content);
         var lineLen=-1
@@ -36,8 +39,19 @@
       host.on("data",handleHostData);      
       
       sys.modules.hostAction.exec('echo -n ~/Notanos',function(err,result) {if (!err) sys.dir=result});
+      sys.environment={}
+      sys.modules.hostAction.exec("env", function(err,result) { 
+            console.log(err,result);
+            if (!err) { result.lines(function (line) {
+                var e=line.indexOf("=");
+                sys.environment[line.to(e)]=line.from(e+1);
+            })}
+            ready=true;
+            API.signal("ready");
+            });
       //now that we have a channel to the host, we can add features like writeFile to FileIO.
       sys.modules.hostAction.extendFileIO();
+      
     }
     
     API.hostCall = function(callName,args,callback) {

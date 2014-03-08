@@ -20,10 +20,8 @@
 		if (e.button==0) {
     		var p=e.currentTarget.parentNode.parentNode; 
             var currentSelection = Array.prototype.slice.call(p.querySelectorAll("li.selected"));
-            console.log(currentSelection);
             currentSelection.each(function(i){i.removeClass("selected");});
             e.currentTarget.addClass("selected");
-            console.log("clicky",e);
         } 
 
 	}
@@ -39,11 +37,10 @@
 	}	
 	
 	function handleDragStart(e) {
-		var data = {fileName : e.currentTarget.dataset["filename"]};
+		var data = {filename : e.currentTarget.dataset["filename"]};
 		e.currentTarget.classList.add("dragorigin");
 		window.dragData=data;									
-		e.dataTransfer.e.currentTarget.dataset["filename"];
-		setData("notanos/object","not here: in window.dragData");
+		e.dataTransfer.setData("notanos/object","not here: in window.dragData");
 	}
 
 	function handleDragEnd(e) {
@@ -57,9 +54,9 @@
 		}
 		if (e.dataTransfer.types[0]=="notanos/object") {
 			var data=window.dragData;
-			var path=e.currentTarget.dataset["filename"];
-			var destinationPath = path+"/"+data.fileName.split("/").pop();
-			if (!FileIO.arePathsEquivalent(data.fileName,destinationPath)) {
+    		var path=e.currentTarget.dataset["filename"];
+			var destinationPath = path+"/"+data.filename.split("/").pop();
+			if (!FileIO.arePathsEquivalent(data.filename,destinationPath)) {
 				e.dataTransfer.dropEffect = 'move';  
 				e.currentTarget.dataset["dropquery"] = "permitted";
 				e.currentTarget.dataset["dropeffect"] = "move";
@@ -76,8 +73,11 @@
 		if (e.dataTransfer.types[0]=="notanos/object") {
 			var data=window.dragData;
 			var path=e.currentTarget.dataset["filename"];
-			var destinationPath = path+"/"+data.fileName.split("/").pop();
-			console.log("rename "+data.fileName+" to "+destinationPath);
+			var destinationPath = path+"/"+data.filename.split("/").pop();            
+            if ( data.filename !== destinationPath) {
+			  console.log("renaming "+data.filename+" to "+destinationPath);
+              FileIO.rename(data.filename,destinationPath);
+            }
 		}
 		if (e.stopPropagation) {
 			e.stopPropagation(); 
@@ -87,20 +87,61 @@
 		return false;
 	}
 
-	function setContainerViewpoint(fileName) {
+    function updateContainerView(container) {
+      if (!container) container=this;
+        var name=container.dataset["fullname"];
+        
+		var list = container.querySelector("ul.fileview");
+        var children=Array.prototype.slice.call(list.children);
+        var currentFiles=children.map(function(child) {return child.dataset["filename"]});
+
+        var currentFiles=Array.prototype.map(list.children,function(child) {return child.dataset["filename"]});
+        function compareFileItems (fileA,fileB){      
+            function fileSignificance(file) {
+                switch (file.contentType) {
+                    case "directory/bundle":  return("0_");
+                    case "directory": return("1_");
+                }
+                return ("9_");
+            }
+            var a = fileSignificance(fileA)+fileA.filename;
+            var b = fileSignificance(fileB)+fileB.filename;
+            return a.localeCompare(b);            
+        }
+        
+        FileIO.getDirectoryListing(name, function (err,dir) {
+            dir.sort(compareFileItems);
+            dir.remove(function(f){return f.filename[0]==='.'});
+            dir.each(function(file) {file.fullName=file.path+"/"+file.filename});
+            
+            dir.each(function(file){
+                var c=children.findIndex(function(i){return i.fileInfo.fullName===file.fullName;});
+                if (c >= 0) {
+                    //it's already there.
+                    children.removeAt(c);
+                } else {
+                    list.appendChild(sys.modules.fileItem.createItem(file));
+                }
+            });
+            children.each(function(n){n.parentNode.removeChild(n)});
+        });
+        
+    }
+	function setContainerViewpoint(filename) {
 		//"this" is expected to be a container element
 		container=this;
-		name=fileName;
+        
+		name=FileIO.normalizePath(filename);
+        if (name!==filename) console.log("normalised ",filename," to ",name);
+        FileIO.stat(filename,function(err,result) {if (!err) container.stat=result});
+        
+        container.dataset["fullname"]=name;
 		container.dataset["filename"]=name=="/"?"":name;
 		var list = container.querySelector("ul.fileview");
 		if (!list) list=container.appendNew("ul","fileview icons");
 		list.innerHTML="";
-        
-        FileIO.getDirectoryListing(name, function (err,dir) {
-            dir.each(function(file){
-                list.appendChild(sys.modules.fileItem.createItem(file)
-            )});
-        });
+                 
+        updateContainerView(container);
 /*
         var dir=WebDav.getDirectoryListing(name);
 		for (var i = 0; i<dir.length;i++) {
@@ -114,11 +155,13 @@
 	API.createItemContainer = function (element,viewMode) {
 		if (!element) element = document.createElement("div");
 		if (!viewMode) viewMode = "icons";
+        element.addClass("itemcontainer");
 		element.appendNew("ul","fileview "+viewMode);
 		element.addEventListener("dragover",handleDragOver,false); 
 		element.addEventListener("dragleave",handleDragLeave,false); 
 		element.addEventListener("drop",handleDragDrop,false); 
 		element.setContainerViewpoint=setContainerViewpoint;
+        element.updateContainerView=updateContainerView;
 		return element;
 	};
 
@@ -128,14 +171,15 @@
 		var contentParts=file.contentType.split("/")
 		var itemData = {
 			"image":" ",
-			"fileName" :(file.path+"/"+file.filename),
+			"filename" :  file.fullName ,//(file.path+"/"+file.filename),
 			"displayName" :file.filename,
 			"fileSize" : file.size,
 			"contentType" :file.contentType
 		}
         var fullName=file.path+"/"+file.filename;
+        li.fileInfo=file;
 		li.innerHTML=Utility.spanify(itemData);
-		if (!file.container) li.dataset["filesize"]=file.contentLength;
+		if (!file.container) li.dataset["filesize"]=file.fileSize;
 		li.dataset["filename"]=fullName;
 		li.dataset["displayname"]=file.filename;
 		li.dataset["contenttype"]=file.contentType;
@@ -168,7 +212,7 @@
 		li.addEventListener("dragstart",handleDragStart,false);
 		li.addEventListener("dragend",handleDragEnd,false);
 
-		if (file.container) {
+		if (file.contentType==="directory") {
 			li.addEventListener("dragover",handleDragOver,false); 
 			li.addEventListener("dragleave",handleDragLeave,false); 
 			li.addEventListener("drop",handleDragDrop,false); 
@@ -176,5 +220,14 @@
 		return li;
 	};
 	
+    //bit of a dirty hack for now.  Anything changed by us, check everything.
+    FileIO.on("modification", function(){
+        var containers=document.body.querySelectorAll(".itemcontainer");
+        console.log("containers",containers);
+        for (var i=0; i<containers.length; i++) {
+            containers[i].updateContainerView();
+            
+        };
+    });
   return API;
 }());

@@ -127,7 +127,7 @@
   
   API._init_ =function(callback) {
   
-    sys.modules.events.bindEventsToClass(BridgeConnection);
+    CustomEvents.bindEventsToClass(BridgeConnection);
    
     sys.modules.bridge.on('connect',reportConnection);
     

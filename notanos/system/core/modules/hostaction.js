@@ -10,11 +10,19 @@
     }
     
     API.rename = function (oldPath,newPath,callback) {
-        sys.modules.hostControl.hostCall("rename",{"oldPath":oldPath,"newPath":newPath},callback);
+        sys.modules.hostControl.hostCall("rename",{"oldPath":oldPath,"newPath":newPath},
+        function(err,result) {
+            if (Object.isFunction(callback)) callback(err,result);
+            FileIO.signal("modification");
+        });
     }
 
     API.symlink = function (srcPath,destPath,callback) {
-        sys.modules.hostControl.hostCall("symlink",{"srcPath":oldPath,"dstPath":newPath},callback);
+        sys.modules.hostControl.hostCall("symlink",{"srcPath":oldPath,"dstPath":newPath},
+        function(err,result) {
+            if (Object.isFunction(callback)) callback(err,result);
+            FileIO.signal("modification");
+        });
     }
 
     API.mkdir = function (path,mode,callback) {
@@ -22,7 +30,11 @@
             callback=mode;
             mode=undefined;
         }
-        sys.modules.hostControl.hostCall("mkdir",{"path":path,"mode":mode},callback);
+        sys.modules.hostControl.hostCall("mkdir",{"path":path,"mode":mode},
+        function(err,result) {
+            if (Object.isFunction(callback)) callback(err,result);
+            FileIO.signal("modification");
+        });
     }
     
 
@@ -31,7 +43,11 @@
     }
 
     API.truncate = function (path,len,callback) {
-        sys.modules.hostControl.hostCall("rename",{"path":path,"len":len},callback);
+        sys.modules.hostControl.hostCall("rename",{"path":path,"len":len},
+        function(err,result) {
+            if (Object.isFunction(callback)) callback(err,result);
+            FileIO.signal("modification");
+        });
     }
 
     API.readFile = function (filename,options,callback) {
@@ -47,7 +63,11 @@
             callback=options;
             options=undefined;
         }
-        sys.modules.hostControl.hostCall("writeFile",{"filename":filename,"data":data,"options":options},callback);        
+        sys.modules.hostControl.hostCall("writeFile",{"filename":filename,"data":data,"options":options},
+        function(err,result) {
+            if (Object.isFunction(callback)) callback(err,result);
+            FileIO.signal("modification");
+        });
     }
 
     API.appendFile = function (filename,data,options,callback) {
@@ -55,7 +75,11 @@
             callback=options;
             options=undefined;
         }
-        sys.modules.hostControl.hostCall("AppendFile",{"filename":filename,"data":data,"options":options},callback);        
+        sys.modules.hostControl.hostCall("AppendFile",{"filename":filename,"data":data,"options":options},
+        function(err,result) {
+            if (Object.isFunction(callback)) callback(err,result);
+            FileIO.signal("modification");
+        });
     }
     
     API.spawn = function (command, args, options) {
@@ -84,7 +108,6 @@
         FileIO.readlink = API.readlink;
         FileIO.mkdir = API.mkdir;
         FileIO.truncate = API.truncate;
-        
     }
     
     //API._init_ =function(callback) {  callback(); }

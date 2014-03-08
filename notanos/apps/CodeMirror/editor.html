@@ -101,7 +101,7 @@
           activePage=newPage;
           activePage.style.visibility="visible";      
           activePage.editor.focus();
-          ClientFrame.setWindowTitle(activePage.editor.fileName);
+          ClientFrame.setWindowTitle(activePage.editor.filename);
       }
       
       function pagerClick(e) {
@@ -124,8 +124,8 @@
       function saveAs(editor) {
         ClientFrame.saveFileDialog("/home/",function (err,result) {
             if (result) {
-                editor.fileName=result;
-                ClientFrame.saveFile(editor.fileName,editor.getValue());
+                editor.filename=result;
+                ClientFrame.saveFile(editor.filename,editor.getValue());
                 editor.modified=false;
                 editor.tab.dataset["modified"]=editor.modified;                  
                 editor.tab.textContent=result.split('/').pop();
@@ -136,11 +136,11 @@
       
       function save(editor) {
         if(!editor) editor=activePage.editor;
-        if (typeof editor.fileName === 'undefined') {
+        if (typeof editor.filename === 'undefined') {
             saveAs(editor);        
             return;
         }            
-        ClientFrame.saveFile(editor.fileName,editor.getValue());
+        ClientFrame.saveFile(editor.filename,editor.getValue());
         editor.modified=false;
         editor.tab.dataset["modified"]=editor.modified;  
       }
@@ -165,6 +165,15 @@
        } 
        return "text-plain"; 
       }
+      function findEditorByFileName(name) {
+        var editordivs=pager.querySelectorAll(".editorhost");
+        for (i=0; i<editordivs.length;i++) {
+            if (editordivs[i].editor.filename === name) {
+              return editordivs[i].editor;
+            }
+        }
+        return null;
+      }
       
       function addEditor(name) {
           function createEditor(content) {
@@ -172,32 +181,37 @@
             li.addEventListener("click",pagerClick,false);
             var pageName="page"+pagenum++;
             li.dataset["showelement"] = pageName;
-            var editorDiv=pager.appendNew("div","",pageName);
+            var editorDiv=pager.appendNew("div","editorhost",pageName);
             editorDiv.editor = CodeMirror(editorDiv, {
                 value: content,  
                 lineNumbers: true,
                 matchBrackets: true
             });
-		editorDiv.editor.on("change",editorChanged);
-		editorDiv.editor.tab = li;
-		editorDiv.editor.modified = false;
-		editorDiv.editor.fileName=name;
-		if (!name) {
-			li.textContent="untitled";
-		} else {
-             li.textContent=name.split('/').pop();
-             editorDiv.editor.setOption("mode",pickType(name));
-            }
+            editorDiv.editor.on("change",editorChanged);
+            editorDiv.editor.tab = li;
+            editorDiv.editor.modified = false;
+            editorDiv.editor.filename=name;
+            if (!name) {
+                li.textContent="untitled";
+            } else {
+                 li.textContent=name.split('/').pop();
+                 editorDiv.editor.setOption("mode",pickType(name));
+                }
 
-            simulateClick(li);
-            setActivePage(editorDiv);
-            activePage=editorDiv;
+                simulateClick(li);
+                setActivePage(editorDiv);
+                activePage=editorDiv;
 
-          }
+        }
         if (!name){
             createEditor(""); 
         } else {
-            if ((!activePage.editor.fileName) && (activePage.editor.modified==false)) {
+            var existingEditor = findEditorByFileName(name);
+            if (existingEditor) {
+                simulateClick(existingEditor.tab);
+                return;
+            }
+            if ((!activePage.editor.filename) && (activePage.editor.modified==false)) {
               closePage();
             }
             ClientFrame.loadFile(name,function (err,content){createEditor(content);});            
@@ -254,7 +268,7 @@
        
        ClientFrame.onActionNotify=function(action) {
           if (action.actionKind=="Open") {
-            addEditor(action.fileName);
+            addEditor(action.filename);
           }
        }
        

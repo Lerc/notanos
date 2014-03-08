@@ -1,3 +1,6 @@
+//This provides a set of general utility classes.
+//class Utility provides miscelaneous stateless functions
+//class FifoBuffer is a buffer of bytes in a fifo
 var Utility = function () {
 	var Api={};
 	
@@ -177,4 +180,49 @@ var FifoBuffer = function () {
 
 }();
 
+var CustomEvents=(function() {
+	var API = {};
+    function on(type, eventFunction) {
+        if (!this) return;
+        if (!this.attachedEvents) this.attachedEvents={};        
+        if (!this.attachedEvents[type]) this.attachedEvents[type] = [];
+        
+        this.attachedEvents[type].add(eventFunction);        
+    }
+
+    function off(type, eventFunction) {
+        if (!this) return;
+        if (!this.attachedEvents) return;        
+        if (!this.attachedEvents[type]) return; 
+        
+        var list = this.attachedEvents[type];
+        list.remove(function (n) {return eventFunction===list[n]});
+    }
+
+    function signal(type /* arguments */) {        
+        if (!this) return;
+        if (!this.attachedEvents) return;        
+        if (!this.attachedEvents[type]) return; 
+        var eventObject=this;
+        var args = Array.prototype.slice.call(arguments,1);
+        this.attachedEvents[type].forEach( function(e) {e.apply(eventObject,args)});
+    }
+        
+    API.bindEventsToClass = function (classConstructor) {
+        classConstructor.prototype.on=on;
+        classConstructor.prototype.off=off;
+        classConstructor.prototype.signal=signal;
+    }
+    
+    function CustomEventEmitter() {
+    
+    }
+
+    API.makeEventEmitter= function () {
+        return new CustomEventEmitter();
+    }
+    API.bindEventsToClass(CustomEventEmitter);
+    //API._init_ =function(callback) {  }
+  return API;
+}());
 

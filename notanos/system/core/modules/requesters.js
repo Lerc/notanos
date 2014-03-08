@@ -18,8 +18,8 @@
 		base.defaultHandler=defaultHandler;
 		var locationbar=base.appendNew("div","locationbar");
 		var pathBar=base.appendNew("ol","pathbar");
-		var fileName=base.appendNew("div","filename").appendNew("input","userinput");
-		fileName.type="text";
+		var filename=base.appendNew("div","filename").appendNew("input","userinput");
+		filename.type="text";
 		var filetype=base.appendNew("div","filetype button").appendNew("select");
         var openButton,savebutton;
         var cancelButton=base.appendNew("div","cancel button"); 
@@ -42,11 +42,11 @@
 		win.onClose = function () {responseCallback("cancelled")};
 	
     function openButtonClick() {        
-        requester_return(currentDirectory+fileName.value)
+        requester_return(currentDirectory+filename.value)
     }
     
     function saveButtonClick() {
-        var savename = currentDirectory+fileName.value;
+        var savename = currentDirectory+filename.value;
         FileIO.exists(savename,function(itdoes) {
             var saveit=true;
             if (itdoes & (options.overwriteQuery===true)) {
@@ -70,47 +70,7 @@
     
     function setFileViewPath(path) {
 			base.setContainerViewpoint(path);
-			/*
-			var dir=WebDav.getDirectoryListing(path);
-			fileView.clear();
 
-      for (var i = 0; i<dir.length;i++) {
-				var li = fileView.appendNew("li");
-				var file = dir[i];
-				var itemData = {
-					"image":" ",
-					"fileName" :file.name,
-					"displayName" :file.displayName,
-					"fileSize" :file.contentLength,
-					"contentType" :file.contentType
-				}
-				li.innerHTML=Utility.spanify(itemData);
-				if (file.container) li.dataset["filesize"]=file.contentLength;
-				li.dataset["filename"]=file.name;
-				li.dataset["displayname"]=file.displayName;
-				li.dataset["contenttype"]=file.contentType;
-				li.dataset["contentclass"]=file.contentType.split("/")[0];
-				li.dataset["contentsubtype"]=file.contentType.split("/")[1];
-				li.addEventListener("dblclick",doubleClick,true);
-				li.addEventListener("click",click,false);
-				li.setAttribute("draggable","true");
-				
-			}	
-
-			function click(e) {
-				if (e.currentTarget.dataset["contentclass"] != "directory") {
-					fileName.value=e.currentTarget.dataset["filename"].split("/").pop(); 
-				}
-			}
-			
-			function doubleClick(e) {
-				if (e.currentTarget.dataset["contentclass"] == "directory") {
-					setCurrentDirectory(e.currentTarget.dataset["filename"]);
-				} else {
-					requester_return(e.currentTarget.dataset["filename"]);
-				}
-			}	
-			*/ 
 		}
 		
     function setCurrentDirectory(newPath) {

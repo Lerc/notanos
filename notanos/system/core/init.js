@@ -4,6 +4,7 @@ sys.dir=location.pathname.to(location.pathname.lastIndexOf("/"));
 function Module(name) {
     this.name=name;
 }
+CustomEvents.bindEventsToClass(Module);
 
 function init() {		
 	function toggleFullScreen() {
@@ -87,6 +88,18 @@ function init() {
         async.forEachSeries(modulesToInit,initModule,function(){log("modules initialized");callback();});
     }
     
+    function thingsToDoAfterLinkEstablished(callback) {
+        function doIt() {
+            async.series([runInitScripts]);            
+        }
+        if (sys.modules.hostControl.isReady()) {
+          doIt();
+        } else {
+            sys.modules.hostControl.on("ready",doIt);            
+        }
+        callback();
+    }
+    
     function runInitScripts(callback) {
         FileIO.getDirectoryListing(sys.dir+"/system/init",
                 function (err,result) {
@@ -119,7 +132,7 @@ function init() {
  */   
        
     }
-    async.series([installModules,initModules,runInitScripts]);
+    async.series([installModules,initModules,thingsToDoAfterLinkEstablished]);
     
     /*
 	var modules = WebDav.getDirectoryListing("/system/core/modules");

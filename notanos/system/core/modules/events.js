@@ -1,6 +1,6 @@
 (function() {
 	var API = new Module("events");
-    function on(type, eventFunction) {
+/*    function on(type, eventFunction) {
         if (!this) return;
         if (!this.attachedEvents) this.attachedEvents={};        
         if (!this.attachedEvents[type]) this.attachedEvents[type] = [];
@@ -17,7 +17,8 @@
         list.remove(function (n) {return eventFunction===list[n]});
     }
 
-    function signal(type /* arguments */) {        
+    function signal(type // arguments 
+                            ) {        
         if (!this) return;
         if (!this.attachedEvents) return;        
         if (!this.attachedEvents[type]) return; 
@@ -34,5 +35,6 @@
     
     API.bindEventsToClass(Module);
     //API._init_ =function(callback) {  }
+*/    
   return API;
 }());

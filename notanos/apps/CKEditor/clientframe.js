@@ -2,8 +2,12 @@ var ClientFrame = function () {
     var loc=window.parent.location;        
     var parentOrigin= loc.protocol+'//'+loc.hostname+(loc.port ? ':'+loc.port: '');
     var API = {}
-    
 
+    API.framePath=function() {
+        var path=window.location.pathname;
+        return path.substring(0,path.lastIndexOf("/"));
+    }
+    
     function is_empty(obj) {
         // Assume if it has a length property with a non-zero value
         // that that property is correct.
@@ -14,7 +18,6 @@ var ClientFrame = function () {
         for (var key in obj) {
             if (hasOwnProperty.call(obj, key))    return false;
         }
-
         return true;
     }
     
@@ -47,66 +50,56 @@ var ClientFrame = function () {
       var handler = pendingResponses[message.responseId];
       if (handler) {
          delete pendingResponses[message.responseId];
-         handler.callback(message.response);
+         handler.callback(message.err,message.response);
       }
     }
 
-    function handleTimeout() {       
-       var now = new Date().getTime();
-       var expired = now-timeoutDuration;
-       for (p in pendingResponses) {
-          var waitingItem = pendingResponses[p];
-          if (waitingItem.timeStamp < expired) {
-             delete pendingResponses[p];
-             waitingItem.callback(); //failure
-          }
-       }
-       if (is_empty(pendingResponses)) {
-          waitingForResponse = false;
-       } else {
-          waitForResponse();
-       }
+    function setResponseHandler (message,responseHandler) {
+      var rId = responseIdCounter++;
+      message.responseId=rId;
+      pendingResponses[rId] = {"callback":responseHandler, "timeStamp": new Date().getTime(),"message":message};
+      return rId;
     }
     
-    function waitForResponse() {
-        setTimeout(handleTimeout,timeoutDuration);
-        waitingForResponse=true;
-    }
-    
-    function registerResponseHandler (responseHandler) {
-      var rID = responseIdCounter++;
-      pendingResponses[rID] = {"callback":responseHandler, "timeStamp": new Date().getTime()};
-      if (waitingForResponse===false) {
-            waitForResponse();
-      }
-      return rID;
+    function queryKnowledgeOfMessage(message, callback) {
+       message.messageType="yoohoo";
+       setResponseHandler(message,callback);     
     }
     
     API.postFunctionCall = function(callName,parameters,responseHandler) {
        var message = {"messageType" : "functionCall",
                        "callName":callName,
                        "parameters":parameters};
+                       
        if (responseHandler) {
-          message.responseId=registerResponseHandler(responseHandler);
+          setResponseHandler(message,responseHandler);
        }
        window.parent.postMessage(message,parentOrigin);        
     }
 
-    API.loadFile=function(fileName,callback) {
-       API.postFunctionCall("loadFile",{"fileName":fileName},callback);
+    API.loadFile=function(filename,callback) {
+       API.postFunctionCall("loadFile",{"filename":filename},callback);
     }
 
-    API.saveFile=function(fileName,content,callback) {
-       API.postFunctionCall("saveFile",{"fileName":fileName, "content":content},callback);
+    API.saveFile=function(filename,content,callback) {
+       API.postFunctionCall("saveFile",{"filename":filename, "content":content},callback);
     }
 
-    API.openFileDialog=function(initialFileName,callback) {
-       API.postFunctionCall("openFileDialog",{"initialFileName":initialFileName},callback);
+    API.openFileDialog=function(initialFilename,callback) {
+       API.postFunctionCall("openFileDialog",{"initialFilename":initialFilename},callback);
     }
 
+    API.saveFileDialog=function(initialFilename,callback) {
+       API.postFunctionCall("saveFileDialog",{"initialFilename":initialFilename},callback);
+    }
+    
     API.setWindowTitle=function(text,callback) {
        API.postFunctionCall("setWindowTitle",{"text":text},callback);
     }
-
+    
+    API.exit=function() {
+        API.postFunctionCall("exit");
+    }
+    
     return API; 
 } ();
