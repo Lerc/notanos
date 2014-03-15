@@ -1092,27 +1092,10 @@ var FileIO = (function (){
        });
     }
     
-    function normalise(path) {
-      if (path[0]=="~") path=sys.environment.HOME+'/'+path.from(1);
-      var parts=path.split("/");
-      var result=[];
-      for (var i=0; i< parts.length;i++) {
-        var part=parts[i];
-        switch (part) {
-            case "..": 
-                result.pop();
-                break;
-            case ".","": 
-                break;
-            default:
-                result.push(part);
-        }                
-      }
-      return path[0]=='/'?'/'+result.join('/'):result.join('/');
-    }
+
     
-    API.normalisePath=normalise;
-    API.normalizePath=normalise;
+    API.normalisePath=Path.normalise;
+    API.normalizePath=Path.normalise;
     
    	API.arePathsEquivalent = function (patha,pathb) 	{
         var a=normalise(patha);

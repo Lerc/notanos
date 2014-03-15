@@ -83,10 +83,6 @@
     }
     
     API.spawn = function (command, args, options) {
-        if (typeof options==="undefined") { 
-            options=args;
-            args=undefined;
-        }
         sys.modules.hostControl.hostCall("spawn",{"command":command,"args":args,"options":options});        
     }
     

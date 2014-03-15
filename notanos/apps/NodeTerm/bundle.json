@@ -1,0 +1,13 @@
+{
+	"bundleType" : "bundle/webapp",
+    "icon" : "terminal.svg",
+	"exec" : {
+			"action" :"Open",
+			"main": "node",
+			"contentType":"application/x-executable",
+			"parameters" : {
+                    "title": "NodeTerm",
+                    "commandLineArgs":["%f/nodeterm.js"] 
+			  }
+			}
+}

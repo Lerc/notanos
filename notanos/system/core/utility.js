@@ -112,6 +112,49 @@ var Utility = function () {
 	return Api;
 }();
 
+var Path = function() {
+    var API={};
+    API.normalise = function (path) {
+      if (path[0]=="~") path=sys.environment.HOME+'/'+path.from(1);
+      var parts=path.split("/");
+      var result=[];
+      for (var i=0; i< parts.length;i++) {
+        var part=parts[i];
+        switch (part) {
+            case "..": 
+                result.pop();
+                break;
+            case ".","": 
+                break;
+            default:
+                result.push(part);
+        }                
+      }
+      return path[0]=='/'?'/'+result.join('/'):result.join('/');
+    }
+    API.normalize = API.normalise;
+
+    API.dirname = function (path) {
+        return path.to(path.lastIndexOf("/"));
+    }
+    
+    API.basename = function (path,ext) {
+        var filename = path.from(path.lastIndexOf("/")+1);
+        if (ext) {
+          filename= filename.to(fileName,lastIndexOf(ext));
+        }
+        return filename;
+    }
+    
+    API.extname = function (path) {
+        var pos=path.lastIndexOf(".");
+        if (pos < 0) return "";
+        return path.from(pos);    
+    }
+    
+    return API;
+}();
+
 var FifoBuffer = function () {
 
     function FifoBuffer() {

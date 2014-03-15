@@ -3,8 +3,10 @@ var ScreenBuffer = require("screen-buffer");
 var net= require('net');
 var fs= require('fs');
 var pty= require('pty.js');
+var path= require('path');
 
 var socketPath=process.env.WEBSESSION;
+var scriptPath=path.dirname(process.argv[1]);
 
 var naosConnection=net.connect(socketPath,handleWebConnect);
 
@@ -18,13 +20,13 @@ terminal.on("change", function (buffer){
 	var diff = ScreenBuffer.diff(remoteExpectation,buffer);
 	var diffString=JSON.stringify(diff);
 	//console.log(diffString);
-	naosConnection.write(diffString+"/n");
+	naosConnection.write(diffString+"\n");
 	ScreenBuffer.patch(remoteExpectation,diff);
 	});
 
 
 function handleWebConnect() {
-    var frame=fs.readFileSync("ttyframe.html");
+    var frame=fs.readFileSync(scriptPath+"/ttyframe.html");
     var header={"protocol":"processframe", "frameContent": frame.toString('base64')};
     naosConnection.write(JSON.stringify(header)+"\n");
     shell= pty.spawn('bash', [], {
@@ -40,6 +42,8 @@ function handleWebConnect() {
     naosConnection.on("data",function(data) {shell.write(data)});
     setInterval(ticker,1000);
 }
+
+naosConnection.on('close',  function() {process.exit()});
 
 function ticker() {
 	//shell.write('whoami\r')

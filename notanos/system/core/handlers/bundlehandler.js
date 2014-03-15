@@ -14,9 +14,14 @@
 						var newParameters=exec.parameters||{};
 						for (var i in parameters) {newParameters[i]=parameters[i]};
 						if (!newParameters.title) newParameters.title=name;
-						var fullName=name+"/"+exec.main;
+                        var fullName=name+"/"+exec.main;
+						if (exec.contentType==="application/x-executable") {
+                            //special case for $PATH beasties
+                            fullName=exec.main;
+                        }
+                        //hacky patch
 						if (exec.main[0]=="/") fullName=exec.main;
-                        if (exec.main[0]=="~") fullName=exec.main;
+                        if (exec.main[0]=="~") fullName=exec.main;                        
 						console.log("fullName:"+fullName);
 						console.log("exec.main:"+exec.main);
 						sys.modules.handlers.performAction(exec.action, fullName,newParameters,exec.contentType);

@@ -48,17 +48,23 @@
 	}
      
   API.performAction = function (actionType,path,parameters,contentType) {
-		log(actionType+": "+path);
-        FileIO.getFileInfo(path, function(err,info) {
-        	//	var info = WebDav.getInfo(path);
-		    if (!contentType) contentType= info.contentType;
+		log(actionType+": "+path + " as contentType ("+contentType+")");
+        if (!contentType) {
+            FileIO.getFileInfo(path, function(err,info) {
+              if (!err) {
+                API.performAction(actionType,path,parameters,info.contentType);
+              }
+            });
+        } else {
 		    var mediaActions = defaultAssociations[contentType];
 		    if (!mediaActions) return; ///make an exception
 		    var relevantHandler=mediaActions[actionType];  
 		    if (!parameters) parameters={};
+            if (!parameters.actionContext) parameters.actionContext=path;            
+            if (!parameters.actionContextDir) parameters.actionContextDir=Path.dirname(path);
             console.log("performing "+actionType+"with ",relevantHandler);
 		    relevantHandler.actions[actionType].act(path,parameters);
-        });
+        };
 	}
 	
 	API.open = function (path,parameters,contentType) {
