@@ -1,11 +1,18 @@
 <html>
 	<head>
 	<style>
+        canvas {
+            position:absolute;
+            left:0px;
+            top:0px;
+            padding:0px;
+            margin:0px;
+        }
 		.terminal.cursor {
 		   box-shadow: inset 0px 0px 2px 2px 
 		}
         @font-face {
-            font-family: 'FixedsysExcelsior301Regular';
+            font-family: 'NodeTerm';
             font-weight: normal;
             font-style: normal;
             -webkit-font-smoothing:aliased;
@@ -120,37 +127,51 @@
     }
 	var display=new ScreenBuffer();
 	
-	var loc=window.parent.location; 
-	var parentOrigin= loc.protocol+'//'+loc.hostname+(loc.port ? ':'+loc.port: '');
+	//var loc=window.parent.location; 
+	//var parentOrigin= loc.protocol+'//'+loc.hostname+(loc.port ? ':'+loc.port: '');
 	function sendData(data) {
-		window.parent.postMessage({"messageType" : "hostmessage", "data" : data},parentOrigin);		
+		window.parent.postMessage({"messageType" : "hostmessage", "data" : JSON.stringify(data)+'\n'},"*");		
 	}
+
+	function setTitle(title) {
+		window.parent.postMessage({"messageType" : "functionCall", "callName" : "setWindowTitle", "parameters": {"text":title} },"*");		
+	}
+
 	addEventListener("message",handleMessage,false);
     var updateNeeded = false;
+    var previousText='';
 	function handleMessage(e) {
-		var text=UTF8ArrToStr(new Uint8Array(e.data.data));	
-		var obj=JSON.parse(text);
-		ScreenBuffer.patch(display,obj);
-        if (updateNeeded===false) {
-            updateNeeded=true;
-            setTimeout(updateDisplay,0);
-        }            
+        if (e.data.messageType === "hostmessage") {
+		    var text=previousText+UTF8ArrToStr(new Uint8Array(e.data.data));
+            previousText="";
+           var obj; 
+           try{ obj=JSON.parse(text); } catch (e) {previousText=text} 
+		    ScreenBuffer.patch(display,obj);
+            if (updateNeeded===false) {
+                updateNeeded=true;
+                setTimeout(updateDisplay,0);
+            }            
+        }
 	}
         var canvas;
         var ctx;
+        var TextCellWidth=10;
+        var TextCellHeight=18;
+        
     function init() {
           canvas  = document.getElementById("output");
           ctx=canvas.getContext("2d");
+          reportWindowSize();
     }
         
     function updateDisplay() {
         updateNeeded=false;
         if (!ctx) return;
-        var cw=12;
-        var ch=18;
+        var cw=TextCellWidth;
+        var ch=TextCellHeight;
         canvas.width=window.innerWidth;
         canvas.height=ch*display.getRows();
-        ctx.font="16px fixedsys";
+        ctx.font="16px NodeTerm";
         ctx.textBaseline="top";
         ctx.fillStyle="black";
         ctx.fillRect(0,0,canvas.width,canvas.height);
@@ -226,13 +247,22 @@
 		function(e) {
 			var ansi=keyCodeToAnsi(e);
 			if (ansi){
-			  sendData(ansi);
+			  sendData({kind:"input","data":ansi});
 			}
 		
 			e.preventDefault();
 			e.stopPropagation();
 		}, 
 		false);
+    window.addEventListener("resize",reportWindowSize);
+
+    function reportWindowSize() {
+        var cols=Math.floor(window.innerWidth/TextCellWidth);
+        var rows=Math.floor(window.innerHeight/TextCellHeight);
+        sendData({"kind":"resize","rows":rows,"columns":cols});
+        //canvas.width=cols*TextCellWidth;
+        //canvas.height=row*TextCellHeight;
+    }
 	</script>
 	</head>	
 	<body onload="init()">

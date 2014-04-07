@@ -40,7 +40,7 @@
      <li onclick="CKEDITOR.instances.editor1.commands.about.exec()">About</li>   
   </ul></li>
 </ul>
-<textarea id="editor1" name="editor1">Stuff
+<textarea id="editor1" name="editor1">This is a quickly thrown together app,  Don't expect it to load and save yet.
 </textarea>
 
 </div>
@@ -54,8 +54,9 @@
     }
     
       function menuOpen() {
-        ClientFrame.openFileDialog("/",function(result){
+        ClientFrame.openFileDialog("/",function(err,result){
           //alert("open " + result);
+          if (err) return;
           if (result) { addEditor(result) };
         });
       }

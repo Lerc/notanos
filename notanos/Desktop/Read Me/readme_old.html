@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Huh?</title>
+		<meta charset="utf-8" />
+	</head>
+	<body style="font-family: sans-serif">
+<h2>What? Why?</h2>
+
+<p>This is a experimental concept. &nbsp; I don&#39;t think I can fully articulate the&nbsp;ideas and goals that went into this. &nbsp;For the most part it is an expreiment to see how far this particular path can go and where it might lead.</p>
+
+<p>At this early stage of development all the system provides is a fairly simple Windowed Environment with a few applications. &nbsp;Almost everything is run in JavaScript. &nbsp;The exception is&nbsp;Termish which is a terminal emulator communicating via WebSockets to a bash shell.</p>
+
+<p><span >One of the ideas that has been motivating this development is that I like the idea of running a &quot;cloud in my pocket&quot; &nbsp;I have a version of Notanos running on a 7-inch tablet that sits in my jacket pocket and I can access the environment from web browsers of desktop machines wherever I happen to be. &nbsp;I require neither internet access for this, nor do I need to trust an online provider with my data (although I could easily sync the file system to a cloud service if I wished to protect myself from the loss of my tablet.</span></p>
+
+<p>A particular use-case that I thought would utilize this model well would be the scenario where you take photographs with your mobile device and then open an image editing package on a nearby desktop machine to do some adjustments without ever needing to move the images off your phone or&nbsp;tablet.</p>
+
+<p>Another possibility is providing an interface where application executables run on the server side and the interface runs on the browser side. &nbsp;This falls somewhere between a model-view-controller WebApp&nbsp;and an X11&nbsp;style application. &nbsp;B<span >y opening up a </span>WebSocket<span > channel from the browser back to a connection </span>multiplexer<span >&nbsp;server side programs could request services from the browser. &nbsp;This would be roughly analogous to </span>X11<span > where instead of a DISPLAY environment variable indicating where to open an </span>X11<span > connection you have a </span>NOTANOS_DISPLAY<span > environment variable that indicates which browser view to use.&nbsp;</span></p>
+
+<p>There is absolutely no security layer on&nbsp;<span style="background-color:rgb(255, 255, 255)">Notanos</span>&nbsp;at this time. &nbsp;My focus has been on getting things to work. &nbsp;There should be a&nbsp;layer that negotiates a login and provides&nbsp;an authorization token that is required for all server operations. &nbsp;That layer does not yet exist.</p>
+
+<p>There is so much that could be done and so much to do, &nbsp;I shall be chipping away at this for some time to come and I&#39;ll be putting the work on Github. &nbsp; I am aiming to get a sufficient API for Web-apps to enable third party programs. There is currently a Open Dialog but no Save as Dialog yet :-/.</p>
+
+<h2>Architecture</h2>
+
+<p>Notanos sits in a directory that is served by a Static Server (using&nbsp;WebDav to support FINDPROP, PUT etc.) &nbsp;The /index.html launches the system. &nbsp;This loads a&nbsp;few&nbsp;JavaScript&nbsp;libraries with general purpose utility functions, &nbsp;/system/core/divwin.js for the Windows (divwin&nbsp;is loaded early to facilitate the log-view&nbsp;window)&nbsp;, &nbsp;system/core/webdav.js so it can detect files to load and finally system/core/init.js. &nbsp;</p>
+
+<h2>init.js</h2>
+
+<p>The main job of init.js is to load modules and then run the scripts in /system/init.</p>
+
+<p>Modules are loaded from the /system/core/modules directory are loaded and eval()-ed&nbsp;with the result placed in sys.modules via <code>sys.modules[module.name]=module; </code>Each module may provide an API by this means.</p>
+
+<p>The scripts in /system/init&nbsp;provide startup actions. &nbsp;The Desktop and Panel are installed by scripts here.&nbsp;</p>
+
+<h2>Handlers</h2>
+
+<p>&nbsp;The Handlers module in turn loads all of the handlers in /system/core/handlers/ &nbsp;Each hander&nbsp;specifies&nbsp;?mediatypes that they can perform actions upon as well as the code for performing that action. &nbsp;A few custom content&nbsp;types are specified for Notanos, &nbsp;most significantly for directories. &quot;directory&quot; is handled by the dumbdirectoryview.js handler and &quot;directory/bundle&quot; is handled by bundlehandler.js. &nbsp; A directory bundle is identified by the presence of a bundle.json inside a directory.</p>
+
+<p>for example.<span >&nbsp; &nbsp;<code>sys.modules.handlers.performAction(&quot;Open&quot;,&quot;/apps/</code></span><code>glgears</code><span ><code>&quot;)</code> will identify /apps/</span>glgears<span > as a directory containing a bundle.json so open it with the bundle handler which inspects the </span>json<span > which contains an exec object specifying that it should now call </span><span ><code>sys.modules.handlers.performAction(&quot;Open&quot;,&quot;/apps/</code></span><code style="line-height: 1.6em;">glgears<span >/index.html&quot;,{&quot;</span>windowWidth<span >&quot;:256,&quot;</span>windowHeight<span >&quot;:256},&quot;application/</span>webapp</code><span ><code>&quot;)</code></span></p>
+
+<p><span >This tells </span>performAction<span > to treat /apps/</span><span >glgears</span><span >/index.html as the content type&nbsp;application/</span><span >webapp instead of html. &nbsp;The webapp handler is the handler that launches the index.html in a frame inside a new divwindow.</span></p>
+
+<h2>The Message API</h2>
+
+<p>This is the intended mechanism for client frames to request services from the host environment. &nbsp;There are just a few calls available at present. &nbsp;loadFile, saveFile and openFileDialog. &nbsp;Obviously more are required and will be added as I need to use them. &nbsp;At present, due to the unrestricted access&nbsp;the system allows, client frames could in-principle bypass the message API entirely, but once a security layer is added, applications in frames will not be allowed to access the server side directly.</p>
+
+<h2>CSS</h2>
+<p>The CSS descibing the user interface is a single monolithic css file /system/core/ui.css.  This should be changed to something more modular,  Possibly constructing a single css from multiple SASS or LESS files. </p>
+<p>Notanos makes extensive use of data attributes to allow CSS presentation of content.
+<pre><code>
+ul.fileview > li[data-contenttype='application/javascript']>.image {
+  background-image: url('/system/data/icons/default/mimetypes/application-javascript.svg');
+}
+</code></pre>
+A fileview can be changed from icon view to details view simply by changing an attibute<br>
+<code>&lt;ul class="fileview icons&gt;...&lt;/ul&gt;</code>  procudes an icon view<br>
+<code>&lt;ul class="fileview details&gt;...&lt;/ul&gt;</code> changes the view to details mode<br>
+</p>
+
+<p>More control for theming will become available when the CSS3 attr() function becomes widely usable on any attribute.
+At the time of writing,  All of the browsers that support attr() restrict it to content attributes</p>
+
+<h2>General Untidiness</h2>
+<p>This project grew out of a variety of experiments.  At one stage the entire system could run out of LocalStorage.
+There are a large number of incomplete parts, and remnants of wrong turns.   The divwin JavaScript started life as something to display 
+simple pop-up info, then it grew somewhat.  The css class for the window is still miniwin as a reminder of its humble beginnings.</p>
+
+<p>Many parts could benefit from being rewritten,  As with all programming projects I know a great deal more about
+what I am attempting than I did when I started.  Some may be horrified at the state of some of the internals, I apologise
+in advance for offending your sensibilities.</p>
+<p>One aspect in-particular needs addressing,  There are a number of blocking http requests that should be converted to callbacks.
+At this stage of development is is much easy to write <code>x=read(j);for (i in x) {z=read(i); doSomethingWith(z)}</code> than to write a callback equivalent.
+With the server component on the local network, this is usable, but not ideal.  I have been looking at the various libraries for converting sync to async
+but have yet to see one that is obviously the 'right' choice.</p> 
+<p>I add bits where I need to to be able to do things in the environment myself.  I am at the point where I can edit and save
+the code for Notanos from within the Notanos I carry around on my tablet,  As I want to do more stuff I'll be supporting more things.</p>
+<p>&nbsp;</p>
+	</body>
+</html>

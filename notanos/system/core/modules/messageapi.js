@@ -34,15 +34,24 @@
 	}
 */
     messageHandlers.hostmessage = function (message) {
-        var frame = message.window.frameElement;
-        var win=frame.win;
+        //var frame = message.window.frameElement;
+        var win=message.frame.win;
         win.connection.send(message.data.data);
     }
     
+    function getIframeFromWindow(frameWindow) {
+        var allFrames = document.getElementsByTagName("IFRAME");
+        
+    }
+    
     function receiveMessage(e) {
+        //console.log("Message recieved ", e);
+        //console.log("Target ", e.target.frame);
+        //console.log("source ", e.source.frame);
+        
 		var handler = messageHandlers[e.data.messageType];
 		if (handler) {
-			var apiMessage = {window:e.source, origin:e.origin, data:e.data};
+			var apiMessage = {window:e.source, frame:e.target.frame, origin:e.origin, data:e.data};
 			messagesAwaitingResponses.push(apiMessage);
 			handler(apiMessage);
 		}		
