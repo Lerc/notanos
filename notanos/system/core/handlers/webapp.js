@@ -15,38 +15,39 @@
 								var clientHeight=parameters.windowClientHeight;
 								
 								var execMessage = {"messageType" :"exec", "parameters":parameters}
-								var frame = null;								
+								var iframe = null;								
 								if (parameters.singleInstance === true) {
-									for (i = 0; i<frames.length; i++) {
-										log("checking "+frames[i].frameElement.original_name+" to see if it is "+name);
-										if (frames[i].frameElement.original_name===name) {
-											frame = frames[i];
+									var iframes=document.querySelectorAll("iframe");
+									for (i = 0; i<iframes.length; i++) {
+										log("checking "+iframes[i].original_name+" to see if it is "+name);
+										if (iframes[i].original_name===name) {
+											iframe = iframes[i];
 											break;
 										}
 									}
 								} 
-								if (frame) {
-									frame.postMessage(execMessage,"*");
+								if (iframe) {
+									iframe.contentWindow.postMessage(execMessage,"*");
 									
-									DivWin.bringToFront(frame.frameElement.win);
-									frame.frameElement.focus();
+									DivWin.bringToFront(iframe.win);
+									iframe.focus();
 								} else {					
 									var win=DivWin.createWindow(	{
-												"left":left, "top":top, "width":width,"height":height, "clientWidth": clientWidth, "clientHeight":clientHeight, title:parameters.title
-												});
+											"left":left, "top":top, "width":width,"height":height, "clientWidth": clientWidth, "clientHeight":clientHeight, title:parameters.title
+										});
 									var frameOverlay=win.clientArea.appendNew("div","fillparent frameoverlay");
-									frame=win.clientArea.appendNew("iframe","fillparent");
-									frame.setAttribute("sandbox","allow-scripts allow-same-origin");
-									frame.src=name;
-									frame.win=win;
-									frame.original_name=name;
-									frame.onload=function() {
-                                        if (!execMessage.parameters.action) execMessage.parameters.action={actionKind:"Launch"};
+									iframe=win.clientArea.appendNew("iframe","fillparent");
+									iframe.setAttribute("sandbox","allow-scripts allow-same-origin");
+									iframe.src=name;
+									iframe.win=win;
+									iframe.original_name=name;
+									iframe.onload=function() {
+										if (!execMessage.parameters.action) execMessage.parameters.action={actionKind:"Launch"};
 										log("sending a message to frame");
 										var message = JSON.stringify(execMessage);
 										log(message);
-										frame.focus();
-										frame.contentWindow.postMessage(execMessage,"*");
+										iframe.focus();
+										iframe.contentWindow.postMessage(execMessage,"*");
 									}
 								}
 			}

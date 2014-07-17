@@ -1,0 +1,64 @@
+<html>
+	<head>
+	<script>
+	function UTF8ArrToStr(aBytes) {
+		var sView = "";
+		for (var nPart, nLen = aBytes.length, nIdx = 0; nIdx < nLen; nIdx++) {
+			nPart = aBytes[nIdx];
+			sView += String.fromCharCode(
+				nPart > 251 && nPart < 254 && nIdx + 5 < nLen ? /* six bytes */
+					/* (nPart - 252 << 32) is not possible in ECMAScript! So...: */
+					(nPart - 252) * 1073741824 + (aBytes[++nIdx] - 128 << 24) + (aBytes[++nIdx] - 128 << 18) + (aBytes[++nIdx] - 128 << 12) + (aBytes[++nIdx] - 128 << 6) + aBytes[++nIdx] - 128
+				: nPart > 247 && nPart < 252 && nIdx + 4 < nLen ? /* five bytes */
+					(nPart - 248 << 24) + (aBytes[++nIdx] - 128 << 18) + (aBytes[++nIdx] - 128 << 12) + (aBytes[++nIdx] - 128 << 6) + aBytes[++nIdx] - 128
+				: nPart > 239 && nPart < 248 && nIdx + 3 < nLen ? /* four bytes */
+					(nPart - 240 << 18) + (aBytes[++nIdx] - 128 << 12) + (aBytes[++nIdx] - 128 << 6) + aBytes[++nIdx] - 128
+				: nPart > 223 && nPart < 240 && nIdx + 2 < nLen ? /* three bytes */
+					(nPart - 224 << 12) + (aBytes[++nIdx] - 128 << 6) + aBytes[++nIdx] - 128
+				: nPart > 191 && nPart < 224 && nIdx + 1 < nLen ? /* two bytes */
+					(nPart - 192 << 6) + aBytes[++nIdx] - 128
+				: /* nPart < 127 ? */ /* one byte */
+					nPart
+			);
+		}
+		return sView;
+	}
+	
+	function sendData(data) {
+		window.parent.postMessage({"messageType" : "hostmessage", "data" : JSON.stringify(data)+'\n'},"*");		
+	}
+
+	function setTitle(title) {
+		window.parent.postMessage({"messageType" : "functionCall", "callName" : "setWindowTitle", "parameters": {"text":title} },"*");		
+	}
+
+	var previousText='';
+	function handleMessage(e) {
+		if (e.data.messageType === "hostmessage") {
+			var text=previousText+UTF8ArrToStr(new Uint8Array(e.data.data));
+			var lines = text.split("\n");
+			previousText=lines.pop();;
+			
+			for (i=0;i<lines.length;i++){
+				var line=lines[i];
+				document.body.innerHTML+=line+"<br>";
+			}	
+		}
+	}
+		
+	document.addEventListener("keypress",
+		function(e) {
+		  sendData({kind:"input","key":String.fromCharCode(e.charCode)});
+		  
+			e.preventDefault();
+			e.stopPropagation();
+		}, 
+		false);
+    addEventListener("message",handleMessage,false);
+		setTitle("This is a simple test for talking to a host side program");
+
+	</script>
+	</head>	
+	<body>
+	</body>
+</html>

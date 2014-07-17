@@ -1,0 +1,27 @@
+ul.fileview > li>.image {
+  background-image: url('icons/buuf_watercolor/mimetypes/unknown.png');
+}
+
+ul.fileview > li[data-contentclass='text']>.image {
+  background-image: url('icons/buuf_watercolor/mimetypes/text-x-generic.png');
+}
+
+ul.fileview > li[data-contentclass='directory']>.image {
+  background-image: url('icons/summerlove/Folder.png');
+}
+
+ul.fileview > li[data-contentclass='image']>.image {
+  background-image: url('icons/buuf_watercolor/mimetypes/image-x-generic.png');
+}
+
+ul.fileview > li[data-contenttype='application/whio']>.image {
+  background-image: url('icons/default/mimetypes/whio_logo.png');
+}
+
+ul.fileview > li[data-contenttype='directory/bundle']>.image {
+  background-image: url('icons/summerlove/bag.png');
+}
+
+ul.fileview > li[data-contenttype='directory/bundle']>.image[data-bundleicon]{
+
+}

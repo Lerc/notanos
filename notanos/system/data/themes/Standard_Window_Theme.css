@@ -1,11 +1,11 @@
 Body {
 	background-color: #def;
 	background-image: url('backdrops/default-background.svg');
-	font-family: 'Droid Sans', arial, sans-serif;
+	font-family: 'Open Sans', arial, sans-serif;
 }
 
 .miniwin {
-	font-family: 'Droid Sans', arial, sans-serif;
+  font-family: 'Open Sans', arial, sans-serif;
   FONT-SIZE: 16px;
   COLOR: #000000; 
   TEXT-ALIGN: left;      
@@ -59,7 +59,7 @@ Body {
 	left:0px;
 	top:0px;
 	width:100%;
-	font-family: 'Droid Sans', arial, sans-serif;
+	font-family: 'Open Sans', arial, sans-serif;
   FONT-SIZE: 16px;
 	height:26px;
 	background-color:#68c;
@@ -86,7 +86,7 @@ Body {
 	top:0.4em;
 	width:0.75em;
 	height:0.75em;
-	font-family: 'Droid Sans', arial, serif;
+	font-family: 'Open Sans', arial, serif;
   FONT-SIZE: 16px;
 	text-align:center;
 	color:#ffe;

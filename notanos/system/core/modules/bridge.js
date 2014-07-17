@@ -1,16 +1,20 @@
 (function() {
 	var API = new Module("bridge");
+  var opcode_open_notify=0;
+  var opcode_close_notify=1;
+  var opcode_data=2;
     
-    var socket;
+  var socket;
   var connections = [];
   
-  function sendBridgeMessage(id,data) {
+  function sendBridgeMessage(id,data,opcode) {
+		if (typeof opcode === "undefined") opcode = opcode_data;
     var dataBlob=new Blob([data]);
     var header=new ArrayBuffer(16);
     var h=new DataView(header);
     h.setUint32(0,id,true);
     h.setUint32(8,dataBlob.size,true);
-    h.getUint8(4,2);
+    h.setUint8(4,opcode);
     socket.send(new Blob([header,dataBlob]));
   }
   
@@ -24,14 +28,19 @@
   function BridgeConnection (id) {
     this.id = id;
     this.initialized=false;
-    this.buffer=new FifoBuffer;
+    this.buffer=new FifoBuffer();
    }
   
   BridgeConnection.prototype.send = function(data) {
     sendBridgeMessage(this.id,data);
   }
     
+  BridgeConnection.prototype.close = function (closeMessageContent) {
+		sendBridgeMessage(this.id,closeMessageContent,opcode_close_notify);	  	
+	} 
+	 
   function startNewConnection (id,content) {
+		console.log("accepting new connection with id #"+id);
     if (connections[id]) { console.log ("starting connection with already existing id, bailing"); return}
     
     var connection = new BridgeConnection(id);
@@ -53,6 +62,7 @@
     if (!connection) { console.log ("recieved something on a connection that isn't open, bailing"); return}
   
     if (connection.initialized) {
+				//console.log("sending data to #"+id,connection);
         connection.signal("data",content);        
     } else {
         connection.buffer.add(content);
@@ -94,7 +104,11 @@
         break;
         
             case 2: dispatchData(ID,content);
+            //console.log("dispatching data to #"+ID); 
         break;
+            case 99:             
+             console.log("message from bridge ",Utility.UTF8ArrToStr(content));             
+				break;
         }
         
     });

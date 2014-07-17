@@ -26,14 +26,14 @@ var DivWin = function () {
 				DivWin.bringToFront(win);
 				var container = win.element.parentNode;
 				if (container.focusedWindow != win) {
-                    win.signal("focus");
-					  if (container.focusedWindow){
-                          container.focusedWindow.signal("blur");
-						  container.focusedWindow.element.removeClass("focused");
-                      }
-						container.focusedWindow=win;
-						win.element.addClass("focused");				
-						container.dataset["focused_window"]=win.element.dataset["window_id"]; 
+					win.signal("focus");
+					if (container.focusedWindow){
+						container.focusedWindow.signal("blur");
+						container.focusedWindow.element.removeClass("focused");
+					}
+					container.focusedWindow=win;
+					win.element.addClass("focused");				
+					container.dataset["focused_window"]=win.element.dataset["window_id"]; 
 				}
 			}
 			function suggestPosition(x,y,w,h,centered) {
@@ -57,6 +57,67 @@ var DivWin = function () {
 				}
 				return({left:x,top:y, width:w,height:h});
 			}	
+			function handleWindowMouseDown(e) {
+				var win=e.currentTarget.owner;
+				if (win.hasFocus() === false) {
+					win.focus();
+					e.preventDefault();
+					e.stopPropagation();
+				}
+			}
+			function DivWindow (options) {
+				var element=document.createElement("div");
+				this.element = element;
+			
+				element.dataset["window_id"]=getNewWinId();
+				element.dataset["stack"]=9999;
+				element.className="miniwin frame";
+				element.owner=this;	
+				var position=options.position
+				var s = element.style;
+				s.left=position.left+'px';
+				s.top=position.top+'px';
+				s.width=position.width+'px';
+				s.height=position.height+'px';
+				s.position='absolute';
+
+				var hostdiv=element;				
+				this.clientArea = hostdiv.appendNew("div","clientarea");
+
+				this.decorations={};
+				var decorations=this.decorations;
+				decorations.titleBar=hostdiv.appendNew("div","titlebar");
+				decorations.caption=decorations.titleBar.appendNew("div","caption");
+				decorations.caption.innerHTML=options.title;
+				decorations.closeButton=decorations.titleBar.appendNew("div","closebutton widget");
+
+				//result.decorations.titlebar
+				
+				decorations.leftdragregion = hostdiv.appendNew("div","leftframe dragregion");
+				decorations.rightdragregion = hostdiv.appendNew("div","rightframe dragregion");
+				decorations.topdragregion = hostdiv.appendNew("div","topframe dragregion");
+				decorations.bottomdragregion = hostdiv.appendNew("div","bottomframe dragregion");
+				decorations.bottomleftdragregion = hostdiv.appendNew("div","bottomleftframe dragregion");
+				decorations.bottomrightdragregion = hostdiv.appendNew("div","bottomrightframe dragregion");
+
+
+				hostdiv.addEventListener("mousedown",handleWindowMouseDown,true); 
+				decorations.leftdragregion.addEventListener("mousedown",LeftEdgeMouseDown,true);
+				decorations.rightdragregion.addEventListener("mousedown",RightEdgeMouseDown,true);
+				decorations.topdragregion.addEventListener("mousedown",TopEdgeMouseDown,true);
+				decorations.bottomdragregion.addEventListener("mousedown",BottomEdgeMouseDown,true);
+				decorations.bottomleftdragregion.addEventListener("mousedown",BottomLeftCornerMouseDown,true);
+				decorations.bottomrightdragregion.addEventListener("mousedown",BottomRightCornerMouseDown,true);
+				decorations.closeButton.addEventListener("click",CloseClick,true);
+				decorations.titleBar.addEventListener("mousedown",TitleBarMouseDown,true);
+			}
+			CustomEvents.bindEventsToClass(DivWindow);
+			
+			DivWindow.prototype.hasFocus = function() {
+				var container = this.element.parentNode;
+				return (container.focusedWindow === this) 
+			}
+			DivWindow.prototype.focus = function(){DivWin.focus(this);};
 			
 	    DivWin.createWindow =function (left,top,width,height,title) {
 				 var parameters;
@@ -73,48 +134,8 @@ var DivWin = function () {
 					 if (parameters.clientHeight) {height=parameters.clientHeight+windowFrameHeight}
 				 } 
 				 var position=suggestPosition(left,top,width,height,centered);
-				 var result = CustomEvents.makeEventEmitter();
-				 var element =document.createElement("div");
-				 element.dataset["window_id"]=getNewWinId();
-				 element.dataset["stack"]=9999;
-				 result.element= element;
-				 element.className="miniwin frame";
-				 element.owner=result;	
-				    var s = element.style;
-						s.left=position.left+'px';
-						s.top=position.top+'px';
-						s.width=position.width+'px';
-						s.height=position.height+'px';
-						s.position='absolute';
-						//s.padding='4px';
-						//s.zIndex='1';
-				  result.decorations={};
-				  var hostdiv=element;
-				  result.decorations.titleBar=hostdiv.appendNew("div","titlebar");
-                  result.decorations.caption=result.decorations.titleBar.appendNew("div","caption");
-				  result.decorations.caption.innerHTML=title;
-				  result.clientArea = hostdiv.appendNew("div","clientarea");
-				  result.decorations.closeButton=result.decorations.titleBar.appendNew("div","closebutton widget");
-					//result.decorations.titlebar
-					
-					result.decorations.leftdragregion = hostdiv.appendNew("div","leftframe dragregion");
-					result.decorations.rightdragregion = hostdiv.appendNew("div","rightframe dragregion");
-					result.decorations.topdragregion = hostdiv.appendNew("div","topframe dragregion");
-					result.decorations.bottomdragregion = hostdiv.appendNew("div","bottomframe dragregion");
-					result.decorations.bottomleftdragregion = hostdiv.appendNew("div","bottomleftframe dragregion");
-					result.decorations.bottomrightdragregion = hostdiv.appendNew("div","bottomrightframe dragregion");
-
-
-					hostdiv.addEventListener("mousedown",function (e){DivWin.focus(e.currentTarget.owner);},true); 
-					result.decorations.leftdragregion.addEventListener("mousedown",LeftEdgeMouseDown,true);
-					result.decorations.rightdragregion.addEventListener("mousedown",RightEdgeMouseDown,true);
-					result.decorations.topdragregion.addEventListener("mousedown",TopEdgeMouseDown,true);
-					result.decorations.bottomdragregion.addEventListener("mousedown",BottomEdgeMouseDown,true);
-					result.decorations.bottomleftdragregion.addEventListener("mousedown",BottomLeftCornerMouseDown,true);
-					result.decorations.bottomrightdragregion.addEventListener("mousedown",BottomRightCornerMouseDown,true);
-					result.decorations.closeButton.addEventListener("click",CloseClick,true);
-					result.decorations.titleBar.addEventListener("mousedown",TitleBarMouseDown,true);
-
+				 
+				 var result = new DivWindow({"position":position,"title":title});
 
 					document.body.appendChild(result.element);
 					
@@ -124,6 +145,7 @@ var DivWin = function () {
 					result.element.addClass("visible");
 					DivWin.focus(result);
 					return result;
+					
 			}
 			
 	  DivWin.closeWindow = function(win) {

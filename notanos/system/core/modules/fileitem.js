@@ -2,6 +2,7 @@
 	var API = new Module("fileItem");
 	//log("fileItemModule");
 	function contextMenu(item) {
+        subFields=sys.modules.contextMenus.makeDefaultSubFields();
 		function menuClick(e) {
 			var menuAction=e.currentTarget.dataset["action"];
 			log("menuClick on "+ item.dataset["filename"]+": "+menuAction);
@@ -9,7 +10,7 @@
 				sys.modules.handlers.performAction("Hack",item.dataset["filename"]);
 			}
 		}
-		sys.modules.contextMenus.attachArcMenu(item,menuClick);
+		sys.modules.contextMenus.attachArcMenu(item,subFields,menuClick);
 	}
 
     function handleContextMenu(e) {
@@ -56,11 +57,11 @@
 			var data=window.dragData;
     		var path=e.currentTarget.dataset["filename"];
 			var destinationPath = path+"/"+data.filename.split("/").pop();
-			if (!FileIO.arePathsEquivalent(data.filename,destinationPath)) {
+			//if (!FileIO.arePathsEquivalent(data.filename,destinationPath)) {
 				e.dataTransfer.dropEffect = 'move';  
 				e.currentTarget.dataset["dropquery"] = "permitted";
 				e.currentTarget.dataset["dropeffect"] = "move";
-			}
+			//}
 		}
 	}
 
