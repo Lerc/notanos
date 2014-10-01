@@ -141,6 +141,15 @@ function init() {
 	}	
 	*/
 
+  function eval_with_check(code) {
+		try {
+  		return eval(code);
+		}
+    catch(ex) {
+			console.log(ex);
+		}
+	}
+	
 	function installModule(name,callback) {
         console.log("installing module " + name, installModule.caller);
 		log("installing module " + name);

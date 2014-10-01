@@ -19,7 +19,7 @@ ul.fileview > li[data-contenttype='application/whio']>.image {
 }
 
 ul.fileview > li[data-contenttype='directory/bundle']>.image {
-  background-image: url('icons/summerlove/bag.png');
+  background-image: url('icons/summerlove/Bag.png');
 }
 
 ul.fileview > li[data-contenttype='directory/bundle']>.image[data-bundleicon]{

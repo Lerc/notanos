@@ -11,7 +11,7 @@ Node.prototype.clear = function() {
 }
 
 Node.prototype.removeClass = function (classNameToRemove) {
-  this.className=this.className.replace(new RegExp('(\\s|^)' + classNameToRemove + '(\\s|$)'), '' );
+  this.className=this.className.replace(new RegExp('(\\s|^)' + classNameToRemove + '(\\s|$)'), ' ' ).trim();
 }
 
 Node.prototype.hasClass = function (className) {

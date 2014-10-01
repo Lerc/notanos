@@ -1,13 +1,47 @@
 (function() {
 	var API = new Module("fileItem");
 	//log("fileItemModule");
+	
+	var contextMenuActions = {};
+	
+	function notImplemented(action,filename) { 
+		log("acion '"+action+"' not implemented.  filename="+filename);
+	}
+	
+	function fileHandlerAction(action,filename) {
+		sys.modules.handlers.performAction(action,filename);
+	}
+	
+	contextMenuActions.symlink = notImplemented; 	
+	contextMenuActions.rename = notImplemented; 	
+	contextMenuActions.clone = notImplemented; 	
+	contextMenuActions.delete = notImplemented; 	
+	contextMenuActions.cut = notImplemented; 	
+	contextMenuActions.copy = notImplemented; 	
+	contextMenuActions.paste = notImplemented; 	
+	
+	contextMenuActions.Hack = fileHandlerAction; 
+	contextMenuActions.Open = fileHandlerAction; 
+	contextMenuActions.Edit = fileHandlerAction; 
+	contextMenuActions.View = fileHandlerAction; 
+	
 	function contextMenu(item) {
-        subFields=sys.modules.contextMenus.makeDefaultSubFields();
-		function menuClick(e) {
-			var menuAction=e.currentTarget.dataset["action"];
-			log("menuClick on "+ item.dataset["filename"]+": "+menuAction);
-			if (menuAction === "look inside") {
-				sys.modules.handlers.performAction("Hack",item.dataset["filename"]);
+    subFields=sys.modules.contextMenus.makeDefaultSubFields();   
+		function menuClick(err,result) {
+			if (result) {
+				var menuAction=result;
+				var filename= item.dataset["filename"];
+				log("menuClick on "+ filename+": "+menuAction);
+				if (Object.has(contextMenuActions,menuAction)) {
+					var actionFunction=contextMenuActions[menuAction];
+					actionFunction(menuAction,filename);
+				}/*
+				if (menuAction === "hack") {
+					sys.modules.handlers.performAction("Hack",item.dataset["filename"]);
+				}
+				if (menuAction === "open") {
+					sys.modules.handlers.performAction("Open",item.dataset["filename"]);
+				}*/
 			}
 		}
 		sys.modules.contextMenus.attachArcMenu(item,subFields,menuClick);
@@ -226,8 +260,7 @@
         var containers=document.body.querySelectorAll(".itemcontainer");
         console.log("containers",containers);
         for (var i=0; i<containers.length; i++) {
-            containers[i].updateContainerView();
-            
+            containers[i].updateContainerView();            
         };
     });
   return API;

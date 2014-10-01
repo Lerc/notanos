@@ -32,7 +32,7 @@
 			connection.on("close",function(){
 					DivWin.closeWindow(win)
 			});
-			win.on("focus", function() { alert("focus noticed"); frame.contentWindow.focus()});
+			win.on("focus", function() { frame.contentWindow.focus()});
     }
     
     API._init_ =function(callback) {

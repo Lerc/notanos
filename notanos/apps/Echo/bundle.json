@@ -1,12 +1,11 @@
 {
-	"bundleType" : "bundle/webapp",
-    
+	"bundleType" : "bundle/webapp",    
 	"exec" : {
 			"action" :"Open",
 			"main": "node",
 			"contentType":"application/x-executable",
 			"parameters" : {
-                    "title": "NodeTerm",
+                    "title": "Echo",
                     "commandLineArgs":["%f/echo.js"] 
 			  }
 			}

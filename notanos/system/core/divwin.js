@@ -89,7 +89,9 @@ var DivWin = function () {
 				decorations.titleBar=hostdiv.appendNew("div","titlebar");
 				decorations.caption=decorations.titleBar.appendNew("div","caption");
 				decorations.caption.innerHTML=options.title;
-				decorations.closeButton=decorations.titleBar.appendNew("div","closebutton widget");
+				decorations.closeButton=decorations.titleBar.appendNew("div","close button widget");
+				decorations.maximizeButton=decorations.titleBar.appendNew("div","maximize button widget");
+				decorations.minimizeButton=decorations.titleBar.appendNew("div","minimize button widget");
 
 				//result.decorations.titlebar
 				
@@ -109,6 +111,8 @@ var DivWin = function () {
 				decorations.bottomleftdragregion.addEventListener("mousedown",BottomLeftCornerMouseDown,true);
 				decorations.bottomrightdragregion.addEventListener("mousedown",BottomRightCornerMouseDown,true);
 				decorations.closeButton.addEventListener("click",CloseClick,true);
+				decorations.minimizeButton.addEventListener("click",minimizeClick,true);
+				decorations.maximizeButton.addEventListener("click",maximizeClick,true);
 				decorations.titleBar.addEventListener("mousedown",TitleBarMouseDown,true);
 			}
 			CustomEvents.bindEventsToClass(DivWindow);
@@ -117,8 +121,14 @@ var DivWin = function () {
 				var container = this.element.parentNode;
 				return (container.focusedWindow === this) 
 			}
-			DivWindow.prototype.focus = function(){DivWin.focus(this);};
 			
+			DivWindow.prototype.isMaximized = function() {				
+				return (this.element.hasClass("maximized")); 
+			}
+
+			DivWindow.prototype.focus = function(){DivWin.focus(this);};
+			DivWindow.prototype.inheritMaximizedSize	= function () {DivWin.inheritMaximizedSize(this)};
+
 	    DivWin.createWindow =function (left,top,width,height,title) {
 				 var parameters;
 				 var centered=false;
@@ -154,6 +164,15 @@ var DivWin = function () {
 		  if (win.onClose) (win.onClose());
 	 }
 	 
+	 DivWin.inheritMaximizedSize = function (win) {
+		 var computedStyle = getComputedStyle(win.element);
+		 var elementStyle= win.element.style;
+		 elementStyle.left = computedStyle.left;
+		 elementStyle.top = computedStyle.top;
+		 elementStyle.width = computedStyle.width;
+		 elementStyle.height = computedStyle.height;
+		 win.element.removeClass("maximized"); 
+	 }
    function LeftEdgeMouseMove(e){
 			 var hostdiv=e.owner.element;
        var oldx=hostdiv.offsetLeft;
@@ -192,6 +211,8 @@ var DivWin = function () {
     function dragEdge(e,dragfunction){			
 			 var hostdiv=e.currentTarget.parentNode;
        var owner=hostdiv.owner;
+ 			 if (owner.isMaximized()) owner.inheritMaximizedSize();
+
        var localX=e.clientX-owner.element.offsetLeft;
        var localY=e.clientY-owner.element.offsetTop;
        owner.dragStartX=localX;
@@ -232,25 +253,39 @@ var DivWin = function () {
        dragEdge(e,BottomRightCornerMouseMove);
        return false;
     }
-    function TitleBarMouseDown(e) {
-        
-       if (e.target.hasClass("widget")) return;
-		var hostdiv=e.currentTarget.parentNode;
-        var localx=e.clientX-hostdiv.offsetLeft;
-        var localy=e.clientY-hostdiv.offsetTop;
-        enableEventCaptureOverlay();
-        hostdiv.owner.dragStartX=localx;
-        hostdiv.owner.dragStartY=localy;
-        Dragging_Div=hostdiv.owner;
-        if (e.preventDefault) e.preventDefault();
-        return false;
-    }    
+    
+		function TitleBarMouseDown(e) {			
+			if (e.target.hasClass("widget")) return;
+			var hostdiv=e.currentTarget.parentNode;			
+			var win=hostdiv.owner;
+			if (win.isMaximized()) win.inheritMaximizedSize();			
+			var localx=e.clientX-hostdiv.offsetLeft;
+			var localy=e.clientY-hostdiv.offsetTop;
+			enableEventCaptureOverlay();
+			hostdiv.owner.dragStartX=localx;
+			hostdiv.owner.dragStartY=localy;
+			Dragging_Div=hostdiv.owner;
+			if (e.preventDefault) e.preventDefault();
+			return false;
+		}    
 
     CloseClick = function(e){
        var owner=e.currentTarget.parentNode.parentNode.owner;  //ugh
        if (e.preventDefault) e.preventDefault();
        if (e.stopPropagation) e.stopPropagation();       
        DivWin.closeWindow(owner);
+    }
+    minimizeClick = function(e){
+       var owner=e.currentTarget.parentNode.parentNode.owner; 
+       if (e.preventDefault) e.preventDefault();
+       if (e.stopPropagation) e.stopPropagation();       
+       owner.element.addClass("minimized");
+    }
+    maximizeClick = function(e){
+       var owner=e.currentTarget.parentNode.parentNode.owner; 
+       if (e.preventDefault) e.preventDefault();
+       if (e.stopPropagation) e.stopPropagation();       
+       owner.element.toggleClass("maximized");
     }
 
 	 function enableEventCaptureOverlay() {

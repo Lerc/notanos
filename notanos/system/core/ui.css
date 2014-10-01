@@ -43,6 +43,11 @@ BODY {
   opacity:0.8;
 }
 
+.hidden {
+	-webkit-transform: scale(.001);
+	transform: scale(.001);
+	opacity: 0;
+}
 
 ul.fileview>li>*{display:none}  /*selectively bring in children*/
 
@@ -262,6 +267,25 @@ ul.fileview.list > li>.displayName {
 	opacity: 1;
 }
 
+.arcmenu>.info {
+  background-color: rgba(255,255,255,0.8);
+  box-shadow: 0px 0px 5px 1px black;
+  width: 110px;
+  height: 20px;
+  left: -55px;
+  position: relative;
+  text-align: center;
+  top: 64px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 16px;
+}
+.arcmenu>.info.hidden {
+	-webkit-transform: scale(.001);
+	transform: scale(.001);
+	opacity: 0;
+}
+
 .arcmenu.hidden {
 	-webkit-transform: scale(.001);
 	transform: scale(.001);
@@ -469,10 +493,17 @@ ul.fileview.list > li>.displayName {
 	background-color:rgba(200,200,200,0.8);
 	box-shadow: 0px 0px 2px 0px black,inset 0px 0px 4px 0px white; 
 	position:absolute;
+	overflow:hidden;
+	transition:all 0.3s;
 }
 
 .arcmenu>.subitem>ul>li:hover {
+	box-shadow: 0px 0px 4px 2px black,inset 0px 0px 4px 0px white; 
+	border-radius:20px;
 	background-color:rgba(255,255,255,1);
+	margin:-2px;
+	padding:2px;
+	z-index:1;
 }
 
 .arcmenu>.subitem>ul>li:nth-child(1) {
@@ -573,8 +604,10 @@ ul.fileview.list > li>.displayName {
 
 
 .arcmenu>.subitem>ul>li>img {
-	width:30px;
-	height:30px;
+	width:64px;
+	height:64px;
+	margin:-16px;
+	opacity: 0.6;
 }
 
 .arcmenu>.subitem>ul>li>.fa {
@@ -588,3 +621,4 @@ ul.fileview.list > li>.displayName {
 .fileview[data-dropquery='permitted'] {
   box-shadow: inset 0px 0px 16px 16px blue;	
 }
+

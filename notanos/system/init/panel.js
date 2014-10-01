@@ -21,7 +21,13 @@ updateClockDisplay();
 setInterval(updateClockDisplay,10000);
 
 function taskBarItemClick(e) {
-		DivWin.focus(e.currentTarget.relatedWindow);	
+	var win=e.currentTarget.relatedWindow;
+	if (win.hasFocus()) {
+		win.element.toggleClass("minimized");
+	}	else {
+		win.element.removeClass("minimized");
+		win.focus();	
+	}
 }
 
 function considerTaskBar() {

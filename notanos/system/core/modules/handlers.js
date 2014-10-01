@@ -82,11 +82,11 @@
                 }
             }
         );
-     	installHandler(makeAssociationHandler(['application/javascript','text/plain','text/html','text/css','application/json'],sys.dir+'/apps/CodeMirror'));
-        
-        FileIO.registerFileType("whio",'application/whio');
-     	installHandler(makeAssociationHandler(['application/whio'],sys.dir+'/apps/Whio'));
-     	installHandler(makeAssociationHandler(['application/whio'],sys.dir+'/apps/CodeMirror',"Hack"));
+			installHandler(makeAssociationHandler(['application/javascript','text/plain','text/html','text/css','application/json'],sys.dir+'/apps/CodeMirror'));
+			
+			FileIO.registerFileType("whio",'application/whio');
+			installHandler(makeAssociationHandler(['application/whio'],sys.dir+'/apps/Whio'));
+			installHandler(makeAssociationHandler(['application/whio'],sys.dir+'/apps/CodeMirror',"Hack"));
 
     /* var handlerDir = WebDav.getDirectoryListing("/system/core/handlers/");
 	    for (var i=0; i<handlerDir.length;i++) {

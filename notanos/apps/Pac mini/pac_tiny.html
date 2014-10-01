@@ -1,4 +1,4 @@
-<html>
+s<html>
 <head>
   <title>DCPU-16 emulator</title>
   <script type="text/javascript" src="dcpu.js"></script>
@@ -1076,12 +1076,12 @@ dat 0x0000, 0x0000
         frameBuffer[i]=0;
       }
     }    
-    var screen = document.getElementById("screen").getContext("2d");
+    var screenctx = document.getElementById("screen").getContext("2d");
     
-    var screenImageData = screen.createImageData(128,96);
+    var screenImageData = screenctx.createImageData(128,96);
 
-    screen.font="7px graphicpixel";
-    screen.textBaseline="top";
+    screenctx.font="7px graphicpixel";
+    screenctx.textBaseline="top";
     
         // Not final yet! Will most probably change after clarifications from Notch
     var keymap = {0x0d: 0x0a, 0x25: 0x01, 0x27: 0x02, 0x26: 0x03, 0x28: 0x04};
@@ -1130,7 +1130,7 @@ dat 0x0000, 0x0000
             screenImageData.data[idx++]=0xFF;
         }
       }
-      screen.putImageData(screenImageData,0,0);
+      screenctx.putImageData(screenImageData,0,0);
     }
     
     function writeChar(x,y,c,fg,bg) {
