@@ -1,0 +1,22 @@
+sudo apt-get install build-essential socat libpam-dev
+
+cd
+wget http://nodejs.org/dist/v0.10.26/node-v0.10.26-linux-arm-pi.tar.gz
+cd /usr/local/lib/
+sudo tar -xzf ~/node-v0.10.26-linux-arm-pi.tar.gz
+cd ../bin/
+sudo ln -s ../lib/node-v0.10.26-linux-arm-pi/bin/node node
+sudo ln -s ../lib/node-v0.10.26-linux-arm-pi/bin/npm npm
+cd
+sudo npm install -g node-gyp
+sudo npm install -g websocket
+sudo npm install -g pty.js
+
+git clone https://github.com/Lerc/userserv
+cd userserv
+make all
+sudo make install 
+
+cd
+wget notanos.tar.gz
+
