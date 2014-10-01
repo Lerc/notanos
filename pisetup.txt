@@ -1,5 +1,7 @@
+#required packages
 sudo apt-get install build-essential socat libpam-dev
 
+#now we need to install node.js and a few node modules
 cd
 wget http://nodejs.org/dist/v0.10.26/node-v0.10.26-linux-arm-pi.tar.gz
 cd /usr/local/lib/
@@ -12,11 +14,19 @@ sudo npm install -g node-gyp
 sudo npm install -g websocket
 sudo npm install -g pty.js
 
+#the server component
 git clone https://github.com/Lerc/userserv
 cd userserv
 make all
 sudo make install 
 
-cd
-wget notanos.tar.gz
+#Make a link from ~/Notanos to wherever you unpacked the notanos directory
+#if this file is ~/[something]/pisetup.txt then the notanos directory will be ~/[something]/notanos
 
+ln -s ~/[something]/notanos ~/Notanos
+
+#Launch the server from a root shell
+sudo su -
+userserv -n
+
+#connect you your rasberrypi from a browser using https://x.y.z.x
