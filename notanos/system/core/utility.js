@@ -181,18 +181,16 @@ var FifoBuffer = function () {
             var newSize=this.tail+this.length+newData.byteLength+this.advance;            
             newSize=Math.ceil(newSize/this.granularity)*this.granularity;
             var newBuffer=new Uint8Array(newSize);
-            var existingData=this.bytes.subarray(this.tail,this.length);
+            var existingData=this.bytes.subarray(this.tail,this.tail+this.length);
             newBuffer.set(existingData);
-            newBuffer.set(newData,this.length);
-            this.length+=newData.byteLength;
+            this.bytes=newBuffer;
             this.tail=0;
             this.head=this.length;
-            this.bytes=newBuffer;
-        } else {
-            this.bytes.set(newData,this.head);
-            this.head+=newData.length;
-            this.length+=newData.length;
-        }
+				}
+        this.bytes.set(newData,this.head);
+        this.head+=newData.byteLength;
+        this.length+=newData.byteLength;
+        
     }
     
     FifoBuffer.prototype.disposeBytes = function(dataLength) {
@@ -210,7 +208,7 @@ var FifoBuffer = function () {
     FifoBuffer.prototype.peek = function (maxLength) {
         if (!maxLength) maxlength=this.length;
         var resultLength = Math.min(maxLength,this.length);
-        return this.bytes.subarray(this.tail,resultLength);
+        return this.bytes.subarray(this.tail,this.tail+resultLength);
     }
     
     FifoBuffer.prototype.find = function (value) {
