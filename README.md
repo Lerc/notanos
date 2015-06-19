@@ -20,13 +20,14 @@ You can use it as a cloud in your pocket or give your headless Linux box a HTML 
 Installation was moderately easy,  then it got harder (sorry)
 
   You need to have Node.js v0.10 or better.   For the CubieBoad I just grabbed the Raspberry-pi binaries from http://nodejs.org/dist/v0.10.24/
+  npm install pty.js websocket
  
   You also need [userserv](https://github.com/Lerc/userserv)
   Follow the instructions on the userserv page to build and install  ( it's just  git clone; make all; make install)
     
     wget http://fingswotidun.com/cruft/notanos.tar.gz
     tar -xzf notanos.tar.gz
-    ln -sr notanos ~/Notanos
+    ln -sr notanos-0.8.0/notanos ~/Notanos
     
 To run the server (with Notanos features enabled)
     userserv -n
