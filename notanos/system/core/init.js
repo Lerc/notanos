@@ -75,11 +75,9 @@ function init() {
     function installModules(callback) {
         FileIO.getDirectoryListing(sys.dir+"/system/core/modules/",
                 function (err,result) {
-                    //console.log("callback happened");
                     if (err) console.log(err);
                     if (result) {
                         var filenames=result.map(function(i) {return i.path+"/"+i.filename});
-                        //filenames.each(log);
                         async.forEachSeries(filenames,installModule,function(){log("modules installed");callback()});
                     }
                 }
@@ -109,40 +107,14 @@ function init() {
                     if (err) console.log(err);
                     if (result) {
                         var filenames=result.map(function(i) {return i.path+"/"+i.filename});
-                        //filenames.each(log);
                         async.forEachSeries(filenames,runScript,function(){log("init scripts finished");callback()});
                     }          
                 }
         );       
-        window.setTimeout(belatedly,3000);
-        
     }
     
-    function belatedly() {
-    
-        console.log("belatedly");
-     //   sys.modules.hostAction.spawn("/home/lerc/socktest.sh");
-/*        
-        sys.modules.hostAction.exec("env",
-        //sys.modules.hostControl.hostCall("stat",{path:"/usr/share/icons/"},
-        function (err,result) {
-            if (err) {
-                console.log("that didn't work");
-                return;
-            }
-            console.log("stat /usr/share/icons/ returned", result);
-        });    
- */   
-       
-    }
     async.series([installModules,initModules,thingsToDoAfterLinkEstablished]);
     
-    /*
-	var modules = WebDav.getDirectoryListing("/system/core/modules");
-	for (var i=0; i<modules.length;i++) {
-		installModule(modules[i].name);
-	}	
-	*/
 
   function eval_with_check(code) {
 		try {
@@ -160,14 +132,6 @@ function init() {
             
             var module = eval(result);
             sys.modules[module.name] = module;
-            /*
-            if (Object.has(module,"_init_")) {
-        		log("initialising module " + module.name);
-                module._init_(function(){Object.freeze(module);callback();});
-            } else {           
-		        Object.freeze(module);
-                callback();
-            }*/
             callback();
         });
 	}
@@ -192,43 +156,4 @@ function init() {
             }
         });
 	}
-
-/*
-	log("\n\nfetching info on '/nofilehere'");
-	log("\n"+JSON.stringify(WebDav.getInfo("/nofilehere"), null, '\t'));			 
-*/	
-	//sys.modules.handlers.open("bacon.txt");
-	/*
-	var firstTask = sys.modules.tasks.primaryTask();
-	var childTask = firstTask.createTask();
-	
-	console.log("first task");
-	console.log(firstTask);
-	console.log("second task");
-	console.log(childTask);
-	console.log("Killing first task");
-	firstTask.kill();
-	console.log("first task");
-	console.log(firstTask);
-	console.log("second task");
-	console.log(childTask);
-	*/
-/*
-	var initScripts = WebDav.getDirectoryListing("/system/init");
-	for (var i=0; i<initScripts.length;i++) {
-		runScript(initScripts[i].name);
-	}	
-
-
-*/	
 }
-
-
-
-
-//readStore();
-//var trash = new Trash();
-    //alert(JSON.stringify(appHandler));
-    //installHandler(appHandler); 
-//getLocalObject("StartUp").contents.forEach(function(k){openItem(k);});    
-//openItem("");
