@@ -240,7 +240,14 @@ var CustomEvents=(function() {
         var list = this.attachedEvents[type];
         list.remove(function (n) {return eventFunction===list[n]});
     }
-
+	
+		function reactsTo(type) {
+        if (!this) return false;
+        if (!this.attachedEvents) return false;        
+        if (!this.attachedEvents[type]) return false; 			
+        return this.attachedEvents[type].length !==0;
+		}
+		
     function signal(type /* arguments */) {        
         if (!this) return;
         if (!this.attachedEvents) return;        
@@ -254,6 +261,7 @@ var CustomEvents=(function() {
         classConstructor.prototype.on=on;
         classConstructor.prototype.off=off;
         classConstructor.prototype.signal=signal;
+        classConstructor.prototype.reactsTo=reactsTo;
     }
     
     function CustomEventEmitter() {
@@ -265,6 +273,35 @@ var CustomEvents=(function() {
     }
     API.bindEventsToClass(CustomEventEmitter);
     //API._init_ =function(callback) {  }
+
+		function reportClickAway(element,handler,handlerParameter) {
+			// this function calls the handler for the first click that happens to the window
+			// but not in the element.  The attached handlers are removed after the click.
+			var elementClicked = true;
+			
+			function elementClick() {
+				elementClicked=true;
+			}
+			
+			function windowClick() {
+				if (elementClicked === false) {
+					removeEvents();
+					handler(handlerParameter);
+				}
+				elementClicked=false;
+			}
+			function removeEvents() {
+					element.removeEventListener("click",elementClick)
+					window.removeEventListener("click",windowClick);				
+			}
+			element.addEventListener("click",elementClick);
+			window.addEventListener("click",windowClick);			
+			
+			return removeEvents;
+		}
+    
+    API.reportClickAway = reportClickAway;
+    
   return API;
 }());
 

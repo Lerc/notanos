@@ -1,8 +1,39 @@
 var workspace=document.body;
 
 var panel = workspace.appendNew("div","panel horizontal stretched bottom");
+
+var menuButton = panel.appendNew("div","menu button");
+var menu = menuButton.appendNew("div","menu");
 var taskbar = panel.appendNew("div","taskbar");
 var miniClock = panel.appendNew("div","clock");
+
+
+var menuDirectoryName=sys.dir+"/apps";
+var menuItems = sys.modules.fileItem.createItemContainer(menu,"list");
+menu.setContainerViewpoint(menuDirectoryName);
+menu.singleClickTrigger=true;
+
+function clickedAwayFromMenu() {
+	menu.removeClass("showing");
+}
+var removeMenuClickAwayHandler;
+function showMenu() {
+	menu.addClass("showing");
+	removeMenuClickAwayHandler=CustomEvents.reportClickAway(menu,clickedAwayFromMenu);
+}
+
+function hideMenu() {
+	removeMenuClickAwayHandler();
+	menu.removeClass("showing");
+}
+
+menuButton.addEventListener("click", function() {
+	if ( menu.hasClass("showing") ) {
+		hideMenu();
+	} else {
+		showMenu();
+	}
+});
 
 function updateClockDisplay() {
 	var now=new Date();
@@ -11,6 +42,7 @@ function updateClockDisplay() {
 	var s=now.getSeconds();
 	var meridian="am";
 	if (h>12) {h-=12; meridian="pm";}
+	if (h==0) h=12;
 	if (h<10) h=" "+h;
 	if (m<10) m="0"+m;
 	if (s<10) s="0"+s;
@@ -59,6 +91,7 @@ function mutationHandler(mutations) {
 	rethink=true;
 	if (rethink) considerTaskBar();
 }
+
 
 
 panel.observer= new MutationObserver(mutationHandler);

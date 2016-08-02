@@ -164,6 +164,30 @@
 		}
 	}
 
+	function handleDragOver(e) {
+		var types = Array.slice(e.dataTransfer.types);
+		
+		if (types.indexOf("notanos/fileitem") >=0 ) {
+			console.log("dragover ",types," has fileitem");
+			e.dataTransfer.dropEffect="move";
+			e.preventDefault();
+			
+		}
+	}
+	
+	function handleDrop(e) {
+		var types = Array.slice(e.dataTransfer.types);
+		if (types.indexOf("notanos/fileitem") >=0 ) {
+			var data = JSON.parse(e.dataTransfer.getData("notanos/fileItem"));
+			console.log("dropped data of ", data);
+		  var pasteName = data.filename;
+		  if (pasteName.indexOf(" ")>=0) pasteName = '"'+pasteName+'"';
+			sendData({kind:"input","data":pasteName});
+			window.focus();
+		}
+		
+	}
+	
 	var canvas;
 	var ctx;
 	var TextCellWidth=10;
@@ -317,7 +341,8 @@
 			//canvas.height=row*TextCellHeight;
 		}
 		
-		
+		window.addEventListener("dragover",handleDragOver); 
+		window.addEventListener("drop",handleDrop); 
 	</script>
 	</head>	
 	<body onload="init()">

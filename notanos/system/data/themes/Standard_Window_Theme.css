@@ -10,13 +10,12 @@ Body {
   TEXT-ALIGN: left;      
 
 }
-.miniwin.frame
+.miniwin
 {
 	overflow: hidden;
 	PADDING: 4px;
 	BORDER: 1px solid #000;
 	BORDER-RADIUS: 14px;
-	-moz-border-radius: 14px;
 	BACKGROUND-COLOR: #eef;
 	box-shadow: 4px 4px 8px rgba(0,0,0,0.8); 
 	-moz-box-shadow: 4px 4px 8px rgba(0,0,0,0.8); 
@@ -27,6 +26,12 @@ Body {
 	-o-transition:opacity 500ms;
 	opacity:0.1;
 	z-index: 0;
+}
+
+.miniwin.borderless {
+	PADDING: 0px;
+	BORDER: none;
+	BORDER-RADIUS: 0px;
 }
 
 .miniwin.visible {
@@ -68,7 +73,14 @@ Body {
 .miniwin[data-stack="10"]  {z-index: -10;}
 
 .miniwin>.clientarea>.frameoverlay  {z-index: 10000;}
-.miniwin[data-stack="0"]>.clientarea>.frameoverlay  {z-index: -9999;}
+.miniwin[data-stack="0"]>.clientarea>.frameoverlay  {z-index: -9999; visibility:hidden;}
+
+/* event blocking overlays should disappear while drag and drop events are happening */
+.DragOperationHappening .frameoverlay {visibility:hidden;}
+
+.miniwin.borderless > .frame {
+	display:none;
+}
 
 .miniwin > .titlebar
 {	position:absolute;
@@ -166,6 +178,14 @@ Body {
 /*	outline: 4px solid red; */
 }
 
+.miniwin.borderless>.clientarea {
+  position:absolute;
+	left:0px;
+	top:0px;
+	right:0px;
+	bottom:0px;
+}
+
 .miniwin > .dragregion {
 	-webkit-user-select: none;
   	-khtml-user-select: none;
@@ -178,7 +198,7 @@ Body {
   background-color: rgba(0,255,0,0.5);
 }
 
-.miniwin > .leftframe.dragregion
+.miniwin > .left.frame.dragregion
 {
 	position:absolute;
 	left:-1px;
@@ -187,7 +207,7 @@ Body {
 	width:6px;
 	cursor:w-resize;
 }
-.miniwin >.rightframe.dragregion
+.miniwin >.right.frame.dragregion
 {
 	position:absolute;
 	right:-1px;
@@ -196,7 +216,7 @@ Body {
 	width:4px;
 	cursor:e-resize;
 }
-.miniwin >.topframe.dragregion
+.miniwin >.top.frame.dragregion
 {
 	position:absolute;
 	left:16px;
@@ -205,7 +225,7 @@ Body {
 	height:6px;
 	cursor:n-resize;
 }
-.miniwin>.bottomframe.dragregion
+.miniwin>.bottom.frame.dragregion
 {
 	position:absolute;
 	left:16px;
@@ -214,7 +234,7 @@ Body {
 	height:6px;
 	cursor:s-resize;
 }
-.miniwin>.bottomleftframe.dragregion
+.miniwin>.bottomleft.frame.dragregion
 {
 	position:absolute;
 	left:0px;
@@ -223,7 +243,7 @@ Body {
 	height:16px;
 	cursor:sw-resize;
 }
-.miniwin>.bottomrightframe.dragregion
+.miniwin>.bottomright.frame.dragregion
 {
 	position:absolute;
 	right:0px;
@@ -458,8 +478,12 @@ Body {
  background: linear-gradient(to bottom, rgba(184,198,223,1) 0%,rgba(109,136,183,1) 100%); /* W3C */
  background: linear-gradient(to bottom, rgba(182,206,249,1) 0%,rgba(127,172,254,1) 100%);
 }
+.panel.horizontal>* {
+	position:relative;
+	display:inline-block;
+}
 .panel.vertical {
- width:64px;
+ width:140px;
 }
 .panel.horizontal.stretched {
  left:0px;
@@ -537,13 +561,50 @@ Body {
 }
 
 .panel>.clock {
-	position:absolute;
-	right:0px;
-	bottom:2px;
+	float:right;
 	width:80px;
 	text-shadow: 1px 1px 3px white, -1px -0px 1px rgba(0,0,0,0.3);
 }
 
+.panel>.menu.button>.menu {
+	transition: visibility 0s linear 0.3s, opacity 0.3s ease-in-out;
+	visibility:hidden;
+	opacity : 0;
+}
+.panel>.menu.button>.menu.showing {
+	transition-delay: 0s;
+	visibility:visible;
+	opacity : 1;
+}
+.panel>.menu.button {
+	width:60px;
+	height:100%;
+	background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAAcCAYAAAA9UNxEAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAK0SURBVFjD7ZhNSFRRFMdHKxvMMDNzYdgi2ugsxIVQVIu0LzCqTQUFIWmoG10o0c4yykUEuahN9mXiQsYUkj5oVWkFQuVomRkGFVIgQlSQEdP/wLnweLz78d48n0zO4scs7r3n3d+de+8574Xi8XhoMRFKCS824dCmg/NFGFSCdnAfvAKj4Am4AapBvt/PXQjhdHAUxEBcwwxoA6uSVTgH9BiI2nkDSpNNmGQfepAVfANbkkWYtnFvArKCz2DjQggvA+tBCVgHlmgeVO+DrOBOkMIF4DQYAb/Ab/4dBidBrsND8sB7jcQn0A2uciyd9G6HHVQBLoF+MADuWrgHoqDQjfBe8EUzkUmwzTaZY5oxlx0WilLSD8WYLkvfTF4s3SL9BBFT4V38T5psuVmw2TKhLkXfHsX2q1OMmwCrud95w3mRcLGJ8Bow5vKcUfGwlJFt0T9gq0J4uSJXz4EivjtG/Rau8Xi57AEZ4J2kfRqs1Fwy1xXxy8AK8NFv4VuSADG+wCYl7Rf4XxpPQLhTISCOzXNFn1bOJHShbQdZJsKDkmAH+IHHJe0D3P7C45YOK44S3ScR7ncE/JX0e2qv0EyEX0uClXOQQ5L2IW6/rfgH+kCaRLhRMW7cVl/Ton9XLOw5rh2MhF9KAu3UCD/TtAuuOKSlGj5zsjE3HRYowjlYNqaDLrkghHO4+Pez8ChXHIVTinHNQQgTJ3wsLaOWuLStr4EHXFFF+b1aNvZtUMJpmrPs9eWBPhBMuRg/E5QwkZ3g6+G0rYITdfoHFzEeBSkspDs9yMYkHwDcCu83ER7TvLG4ERYc1pw1wVcuHrIlcfINKy166akyTUu14CxoYai6OgM2WNJBm6W9hfNetaaKoipsB7ho+4j3mFMIjV+riUGlZYNtfgKaYxPYZ017qc+0KeH/nH+7mUcncOPzsQAAAABJRU5ErkJggg==);
+	background-color: rgba(0,0,0,0.15);	
+}
+.panel>.menu.button:hover {
+	background-color: rgba(255,255,255,0.15);	
+}
+
+.panel>.menu.button:active {
+	box-shadow: inset 6px 6px 12px 2px rgba(0,0,0,0.2);
+}
+
+.panel>.menu.button>.menu {
+	position: absolute;
+	width:250px;
+	background-color: rgba(240,245,255,0.9);
+	box-shadow: 0px 0px 1px 1px inset,2px 0px 0px 0px black;
+}
+.panel.bottom>.menu.button>.menu {
+	bottom: 30px;
+	border-radius: 0px 20px 0px 0px;
+
+}
+.panel.top>.menu.button>.menu {
+	top: 30px;
+	border-radius: 0px 0px 20px 0px;
+}
 .desktop {
  z-index:-1000;
  position:absolute;

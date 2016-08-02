@@ -18,7 +18,8 @@
     socket.send(new Blob([header,dataBlob]));
   }
   
-  function connectionOpened() {
+  function connectionOpened(e) {
+	  console.log("websocket connection opened" , e);
   }
   
   function connectionClosed() {
@@ -136,7 +137,7 @@
   }
   
   function reportConnection(connection) {
-    //log("connect event fired");
+     log("connect event fired");
   }
   
   API._init_ =function(callback) {
@@ -145,7 +146,7 @@
    
     sys.modules.bridge.on('connect',reportConnection);
     
-    API.connect("wss://"+location.host);       
+    API.connect("wss://"+location.host+"/bridge");       
 
     callback();
     

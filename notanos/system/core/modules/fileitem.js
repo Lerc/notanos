@@ -5,7 +5,7 @@
 	var contextMenuActions = {};
 	
 	function notImplemented(action,filename) { 
-		log("acion '"+action+"' not implemented.  filename="+filename);
+		log("action '"+action+"' not implemented.  filename="+filename);
 	}
 	
 	function fileHandlerAction(action,filename) {
@@ -47,38 +47,66 @@
 		sys.modules.contextMenus.attachArcMenu(item,subFields,menuClick);
 	}
 
-    function handleContextMenu(e) {
+  function handleContextMenu(e) {
         contextMenu(e.currentTarget);
         e.preventDefault();
-    }
-	function handleClick(e) {
+  }
+  
+  function select(e){
 		if (e.button==0) {
-    		var p=e.currentTarget.parentNode.parentNode; 
-            var currentSelection = Array.prototype.slice.call(p.querySelectorAll("li.selected"));
-            currentSelection.each(function(i){i.removeClass("selected");});
-            e.currentTarget.addClass("selected");
-        } 
-
+			var p=e.currentTarget.parentNode.parentNode; // <li> -> <ul> -> wrapper div;
+			var currentSelection = Array.prototype.slice.call(p.querySelectorAll("li.selected"));
+			currentSelection.each(function(i){i.removeClass("selected");});
+			e.currentTarget.addClass("selected");
+		} 
 	}
-
-	function doubleClick(e) {	
+	
+	function trigger(e) {
 		var p=e.currentTarget.parentNode.parentNode; 
 		if (Object.isFunction(p.defaultHandler)) {
-            console.log("default handler trigered");
-            var handled = p.defaultHandler(e);
+			console.log("default handler triggered");
+			var handled = p.defaultHandler(e);
 		} else {  
 			sys.modules.handlers.open(e.currentTarget.dataset["filename"]);
 		}
 	}	
 	
+	function handleClick(e) {
+		var p=e.currentTarget.parentNode.parentNode; // <li> -> <ul> -> wrapper div;
+		if (p.singleClickTrigger) {
+			trigger(e)
+		} else {
+			select(e);
+		}
+	}
+	
+	function doubleClick(e) {	
+		trigger(e);
+	}
+	function getFileItemData(element) {
+		var result = {
+			filename : element.dataset["filename"],
+			contentClass : element.dataset["contentclass"],
+			contentType : element.dataset["contenttype"],
+			contentSubType : element.dataset["contentsubtype"],
+			displayName : element.dataset["displayname"]
+		}
+		
+		return result;
+	}
 	function handleDragStart(e) {
-		var data = {filename : e.currentTarget.dataset["filename"]};
+		document.body.addClass("DragOperationHappening");
+		var data = getFileItemData(e.currentTarget);
+		
 		e.currentTarget.classList.add("dragorigin");
-		window.dragData=data;									
+		window.dragData=data;						
+		e.dataTransfer.effectAllowed="all";			
 		e.dataTransfer.setData("notanos/object","not here: in window.dragData");
+		e.dataTransfer.setData("notanos/fileitem",JSON.stringify(data));
 	}
 
 	function handleDragEnd(e) {
+		document.body.removeClass("DragOperationHappening");
 		e.currentTarget.classList.remove("dragorigin");
 	}
 
@@ -109,10 +137,10 @@
 			var data=window.dragData;
 			var path=e.currentTarget.dataset["filename"];
 			var destinationPath = path+"/"+data.filename.split("/").pop();            
-            if ( data.filename !== destinationPath) {
-			  console.log("renaming "+data.filename+" to "+destinationPath);
-              FileIO.rename(data.filename,destinationPath);
-            }
+			if ( data.filename !== destinationPath) {
+				console.log("renaming "+data.filename+" to "+destinationPath);
+				FileIO.rename(data.filename,destinationPath);
+			}
 		}
 		if (e.stopPropagation) {
 			e.stopPropagation(); 
@@ -122,61 +150,60 @@
 		return false;
 	}
 
-    function updateContainerView(container) {
-      if (!container) container=this;
-        var name=container.dataset["fullname"];
+	function updateContainerView(container) {
+		if (!container) container=this;
+		var name=container.dataset["fullname"];
         
 		var list = container.querySelector("ul.fileview");
-        var children=Array.prototype.slice.call(list.children);
-        var currentFiles=children.map(function(child) {return child.dataset["filename"]});
+		var children=Array.prototype.slice.call(list.children);
+		var currentFiles=children.map(function(child) {return child.dataset["filename"]});
 
-        var currentFiles=Array.prototype.map(list.children,function(child) {return child.dataset["filename"]});
-        function compareFileItems (fileA,fileB){      
-            function fileSignificance(file) {
-                switch (file.contentType) {
-                    case "directory/bundle":  return("0_");
-                    case "directory": return("1_");
-                }
-                return ("9_");
-            }
-            var a = fileSignificance(fileA)+fileA.filename;
-            var b = fileSignificance(fileB)+fileB.filename;
-            return a.localeCompare(b);            
-        }
+		var currentFiles=Array.prototype.map(list.children,function(child) {return child.dataset["filename"]});
+		function compareFileItems (fileA,fileB){      
+				function fileSignificance(file) {
+						switch (file.contentType) {
+								case "directory/bundle":  return("0_");
+								case "directory": return("1_");
+						}
+						return ("9_");
+				}
+				var a = fileSignificance(fileA)+fileA.filename;
+				var b = fileSignificance(fileB)+fileB.filename;
+				return a.localeCompare(b);            
+		}
         
-        FileIO.getDirectoryListing(name, function (err,dir) {
-            dir.sort(compareFileItems);
-            dir.remove(function(f){return f.filename[0]==='.'});
-            dir.each(function(file) {file.fullName=file.path+"/"+file.filename});
-            
-            dir.each(function(file){
-                var c=children.findIndex(function(i){return i.fileInfo.fullName===file.fullName;});
-                if (c >= 0) {
-                    //it's already there.
-                    children.removeAt(c);
-                } else {
-                    list.appendChild(sys.modules.fileItem.createItem(file));
-                }
-            });
-            children.each(function(n){n.parentNode.removeChild(n)});
-        });
+		FileIO.getDirectoryListing(name, function (err,dir) {
+			dir.sort(compareFileItems);
+			dir.remove(function(f){return f.filename[0]==='.'});
+			dir.each(function(file) {file.fullName=file.path+"/"+file.filename});
+			dir.each(function(file){
+				var c=children.findIndex(function(i){return i.fileInfo.fullName===file.fullName;});
+				if (c >= 0) {
+					//it's already there.
+					children.removeAt(c);
+				} else {
+					list.appendChild(sys.modules.fileItem.createItem(file));
+				}
+			});
+			children.each(function(n){n.parentNode.removeChild(n)});
+		});
         
-    }
+	}
 	function setContainerViewpoint(filename) {
 		//"this" is expected to be a container element
 		container=this;
         
 		name=FileIO.normalizePath(filename);
-        if (name!==filename) console.log("normalised ",filename," to ",name);
-        FileIO.stat(filename,function(err,result) {if (!err) container.stat=result});
+		if (name!==filename) console.log("normalised ",filename," to ",name);
+		FileIO.stat(filename,function(err,result) {if (!err) container.stat=result});
         
-        container.dataset["fullname"]=name;
+		container.dataset["fullname"]=name;
 		container.dataset["filename"]=name=="/"?"":name;
 		var list = container.querySelector("ul.fileview");
 		if (!list) list=container.appendNew("ul","fileview icons");
 		list.innerHTML="";
                  
-        updateContainerView(container);
+		updateContainerView(container);
 /*
         var dir=WebDav.getDirectoryListing(name);
 		for (var i = 0; i<dir.length;i++) {
@@ -190,13 +217,14 @@
 	API.createItemContainer = function (element,viewMode) {
 		if (!element) element = document.createElement("div");
 		if (!viewMode) viewMode = "icons";
-        element.addClass("itemcontainer");
+		element.singleClickOpen=false;
+		element.addClass("itemcontainer");
 		element.appendNew("ul","fileview "+viewMode);
 		element.addEventListener("dragover",handleDragOver,false); 
 		element.addEventListener("dragleave",handleDragLeave,false); 
 		element.addEventListener("drop",handleDragDrop,false); 
 		element.setContainerViewpoint=setContainerViewpoint;
-        element.updateContainerView=updateContainerView;
+		element.updateContainerView=updateContainerView;
 		return element;
 	};
 
@@ -211,8 +239,8 @@
 			"fileSize" : file.size,
 			"contentType" :file.contentType
 		}
-        var fullName=file.path+"/"+file.filename;
-        li.fileInfo=file;
+		var fullName=file.path+"/"+file.filename;
+		li.fileInfo=file;
 		li.innerHTML=Utility.spanify(itemData);
 		if (!file.container) li.dataset["filesize"]=file.fileSize;
 		li.dataset["filename"]=fullName;
@@ -223,19 +251,19 @@
 		//console.log("checking:" +file.contentType);
 		if (file.contentType == "directory/bundle") {
 			//console.log(file);
-            FileIO.getFileAsString(fullName+"/bundle.json",function(err,bundleText) {
-                if (err) return;
-    			var imageSpan = li.querySelector(".image");	
-                //console.log("bundleText",bundleText);
-			    var bundle = JSON.parse(bundleText);
-			    if (bundle) {
-				    if (bundle.icon) {
+			FileIO.getFileAsString(fullName+"/bundle.json",function(err,bundleText) {
+				if (err) return;
+				var imageSpan = li.querySelector(".image");	
+							//console.log("bundleText",bundleText);
+				var bundle = JSON.parse(bundleText);
+				if (bundle) {
+					if (bundle.icon) {
 					 imageSpan.dataset["bundleicon"]=fullName+"/"+bundle.icon;
 					 //if css3 attr() worked we wouldn't need a custom style
 					 imageSpan.style.backgroundImage="url("+escape(fullName)+"/"+bundle.icon+")";												 
-					 
-				    }
-                }
+				 
+					}
+				}
 			});
 		}
 		

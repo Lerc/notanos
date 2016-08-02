@@ -43,6 +43,9 @@ function init() {
 	document.addEventListener("keyup",eventSuppressor,false);
 	document.addEventListener("keypress",eventSuppressor,false);
 	
+    //we blur iframes when we click away from them. If the mousedown was still on the iframe this event won't trigger 
+    document.addEventListener("mousedown", function(){if (document.activeElement.nodeName==="IFRAME") document.activeElement.blur(); } ,false)
+    
 	var logwin = DivWin.createWindow(30,200,640,280,"Log");
 	var logbox= logwin.clientArea.appendNew("textarea","fillparent");
     logbox.spellcheck='false';

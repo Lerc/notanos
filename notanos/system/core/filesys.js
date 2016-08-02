@@ -1062,7 +1062,7 @@ var FileIO = (function (){
     }
     
     API.getFileAsString = function (name,callback) {
-        requestFile(escape(name),"string",callback);
+        requestFile(escape(name),"text",callback);
     }
     
     API.writeFile = function (name,data,callback) {
