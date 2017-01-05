@@ -3,11 +3,11 @@
     "icon" : "terminal.svg",
 	"exec" : {
 			"action" :"Open",
-			"main": "node",
+			"main": "bash",
 			"contentType":"application/x-executable",
 			"parameters" : {
                     "title": "NodeTerm",
-                    "commandLineArgs":["%f/nodeterm.js"] 
+                    "commandLineArgs":["%f/launch_nodeterm"] 
 			  }
 			}
 }
