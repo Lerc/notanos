@@ -3,9 +3,9 @@
 var workSpace=document.body;
 var desktopDirectoryName=sys.dir+"/Desktop";
 var desktop=sys.modules.fileItem.createItemContainer();
-desktop.addClass("desktop");
-workSpace.appendChild(desktop);
-desktop.setContainerViewpoint(desktopDirectoryName);
+desktop.element.addClass("desktop");
+workSpace.appendChild(desktop.element);
+desktop.setViewPoint(desktopDirectoryName);
 
 /*
 var list=desktop.appendNew("ul","fileview icons");
@@ -14,12 +14,11 @@ for (var i = 0; i<dir.length;i++) {
 	var file = dir[i];
 	var li = sys.modules.fileItem.createItem(file);
 	list.appendChild(li);
-}	
+}
 */
 /*
-desktop.addEventListener("dragover",handleDragOver,false); 
-desktop.addEventListener("dragleave",handleDragLeave,false); 
-desktop.addEventListener("drop",handleDragDrop,false); 
+desktop.addEventListener("dragover",handleDragOver,false);
+desktop.addEventListener("dragleave",handleDragLeave,false);
+desktop.addEventListener("drop",handleDragDrop,false);
 
 */
-

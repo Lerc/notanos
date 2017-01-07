@@ -10,7 +10,7 @@ var miniClock = panel.appendNew("div","clock");
 
 var menuDirectoryName=sys.dir+"/apps";
 var menuItems = sys.modules.fileItem.createItemContainer(menu,"list");
-menu.setContainerViewpoint(menuDirectoryName);
+menuItems.setViewPoint(menuDirectoryName);
 menu.singleClickTrigger=true;
 
 function clickedAwayFromMenu() {
@@ -58,27 +58,27 @@ function taskBarItemClick(e) {
 		win.element.toggleClass("minimized");
 	}	else {
 		win.element.removeClass("minimized");
-		win.focus();	
+		win.focus();
 	}
 }
 
 function considerTaskBar() {
 	taskbar.innerHTML="";
 	var windows = workspace.querySelectorAll(".miniwin");
-	
+
 	for (var i=0; i<windows.length;i++) {
 		var w=windows[i];
 	  var titleBar=w.querySelector(".titlebar");
 		var item=taskbar.appendNew("div","taskbaritem");
 		if (w.dataset.stack==="0") item.addClass("focused");
 		var caption=item.appendNew("div","caption");
-		var image=item.appendNew("img","icon");		
+		var image=item.appendNew("img","icon");
 		caption.textContent=titleBar.textContent;
 		item.relatedWindow=w.owner;
 		image.src=w.iconImage || "system/data/icons/default/categories/generic-window.svg";
 		item.addEventListener("click",taskBarItemClick,false);
 	};
-	
+
 }
 
 function mutationHandler(mutations) {
@@ -86,7 +86,7 @@ function mutationHandler(mutations) {
 	/*for (var i=0; i<mutations.length;i++) {
 	  var mutation = mutations[i];
 	  if (mutation.type==="childList") rethink=true;
-	  
+
 	};*/
 	rethink=true;
 	if (rethink) considerTaskBar();
