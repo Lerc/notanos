@@ -1,3 +1,4 @@
+/*global Module sys log FileIO CustomEvents Utility*/
 (function() {
 	var API = new Module("fileItem");
 	//log("fileItemModule");
@@ -26,7 +27,7 @@
 	contextMenuActions.View = fileHandlerAction;
 
 	function contextMenu(item) {
-    subFields=sys.modules.contextMenus.makeDefaultSubFields();
+		let subFields=sys.modules.contextMenus.makeDefaultSubFields();
 		function menuClick(err,result) {
 			if (result) {
 				var menuAction=result;
@@ -47,12 +48,12 @@
 		sys.modules.contextMenus.attachArcMenu(item,subFields,menuClick);
 	}
 
-  function handleContextMenu(e) {
-        contextMenu(e.currentTarget);
-        e.preventDefault();
-  }
+	function handleContextMenu(e) {
+		contextMenu(e.currentTarget);
+		e.preventDefault();
+	}
 
-  function select(e){
+	function select(e){
 		if (e.button==0) {
 			var p=e.currentTarget.parentNode.parentNode; // <li> -> <ul> -> wrapper div;
 			var currentSelection = Array.prototype.slice.call(p.querySelectorAll("li.selected"));
@@ -65,7 +66,7 @@
 		var p=e.currentTarget.parentNode.parentNode;
 		if (Object.isFunction(p.defaultHandler)) {
 			console.log("default handler triggered");
-			var handled = p.defaultHandler(e);
+			p.defaultHandler(e);
 		} else {
 			sys.modules.handlers.open(e.currentTarget.dataset["filename"]);
 		}
@@ -74,7 +75,7 @@
 	function handleClick(e) {
 		var p=e.currentTarget.parentNode.parentNode; // <li> -> <ul> -> wrapper div;
 		if (p.singleClickTrigger) {
-			trigger(e)
+			trigger(e);
 		} else {
 			select(e);
 		}
@@ -90,7 +91,7 @@
 			contentType : element.dataset["contenttype"],
 			contentSubType : element.dataset["contentsubtype"],
 			displayName : element.dataset["displayname"]
-		}
+		};
 
 		return result;
 	}
@@ -117,13 +118,13 @@
 		}
 		if (e.dataTransfer.types[0]=="notanos/object") {
 			var data=window.dragData;
-    		var path=e.currentTarget.dataset["filename"];
+			var path=e.currentTarget.dataset["filename"];
 			var destinationPath = path+"/"+data.filename.split("/").pop();
-			//if (!FileIO.arePathsEquivalent(data.filename,destinationPath)) {
+			if (!FileIO.arePathsEquivalent(data.filename,destinationPath)) {
 				e.dataTransfer.dropEffect = 'move';
 				e.currentTarget.dataset["dropquery"] = "permitted";
 				e.currentTarget.dataset["dropeffect"] = "move";
-			//}
+			}
 		}
 	}
 
@@ -162,33 +163,33 @@
 	}
 
 	CustomEvents.bindEventsToClass(FileItemView);
-	
+
 	FileItemView.prototype.updateView = function() {
-		element=this.element;
+		let element=this.element;
 		var name=element.dataset["fullname"];
 
 		var list = element.querySelector("ul.fileview");
-		var children=Array.prototype.slice.call(list.children);
-		var currentFiles=children.map(function(child) {return child.dataset["filename"]});
 
-		var currentFiles=Array.prototype.map(list.children,function(child) {return child.dataset["filename"]});
+		var children=Array.prototype.slice.call(list.children);
+		//var currentFiles=children.map(function(child) {return child.dataset["filename"]});
+
 		function compareFileItems (fileA,fileB){
-				function fileSignificance(file) {
-						switch (file.contentType) {
-								case "directory/bundle":  return("0_");
-								case "directory": return("1_");
-						}
-						return ("9_");
+			function fileSignificance(file) {
+				switch (file.contentType) {
+					case "directory/bundle":  return("0_");
+					case "directory": return("1_");
 				}
-				var a = fileSignificance(fileA)+fileA.filename;
-				var b = fileSignificance(fileB)+fileB.filename;
-				return a.localeCompare(b);
+				return ("9_");
+			}
+			var a = fileSignificance(fileA)+fileA.filename;
+			var b = fileSignificance(fileB)+fileB.filename;
+			return a.localeCompare(b);
 		}
 
 		FileIO.getDirectoryListing(name, function (err,dir) {
 			dir.sort(compareFileItems);
-			dir.remove(function(f){return f.filename[0]==='.'});
-			dir.each(function(file) {file.fullName=file.path+"/"+file.filename});
+			dir.remove(function(f){return f.filename[0]==='.';});
+			dir.each(function(file) {file.fullName=file.path+"/"+file.filename;});
 			dir.each(function(file){
 				var c=children.findIndex(function(i){return i.fileInfo.fullName===file.fullName;});
 				if (c >= 0) {
@@ -198,17 +199,17 @@
 					list.appendChild(sys.modules.fileItem.createItem(file));
 				}
 			});
-			children.each(function(n){n.parentNode.removeChild(n)});
+			children.each(function(n){n.parentNode.removeChild(n);});
 		});
 
-	}
+	};
 
 	FileItemView.prototype.setViewPoint = function (filename) {
 		var element=this.element;
 
 		name=FileIO.normalizePath(filename);
 		if (name!==filename) console.log("normalised ",filename," to ",name);
-		FileIO.stat(filename,function(err,result) {if (!err) element.stat=result});
+		FileIO.stat(filename,function(err,result) {if (!err) element.stat=result;});
 
 		element.dataset["fullname"]=name;
 		element.dataset["filename"]=name=="/"?"":name;
@@ -217,23 +218,23 @@
 		list.innerHTML="";
 
 		this.updateView();
-	}
+	};
 
 	API.createItemContainer = function (element,viewMode) {
 		return new FileItemView (element,viewMode);
-	}
+	};
 
 	API.createItem = function (file) {
         //console.log("createItem",file);
 		var li=document.createElement("li");
-		var contentParts=file.contentType.split("/")
+		var contentParts=file.contentType.split("/");
 		var itemData = {
 			"image":" ",
 			"filename" :  file.fullName ,//(file.path+"/"+file.filename),
 			"displayName" :file.filename,
 			"fileSize" : file.size,
 			"contentType" :file.contentType
-		}
+		};
 		var fullName=file.path+"/"+file.filename;
 		li.fileInfo=file;
 		li.innerHTML=Utility.spanify(itemData);
@@ -253,9 +254,9 @@
 				var bundle = JSON.parse(bundleText);
 				if (bundle) {
 					if (bundle.icon) {
-					 imageSpan.dataset["bundleicon"]=fullName+"/"+bundle.icon;
-					 //if css3 attr() worked we wouldn't need a custom style
-					 imageSpan.style.backgroundImage="url("+escape(fullName)+"/"+bundle.icon+")";
+						imageSpan.dataset["bundleicon"]=fullName+"/"+bundle.icon;
+						//if css3 attr() worked we wouldn't need a custom style
+						imageSpan.style.backgroundImage="url("+escape(fullName)+"/"+bundle.icon+")";
 
 					}
 				}
@@ -279,12 +280,12 @@
 	};
 
     //bit of a dirty hack for now.  Anything changed by us, check everything.
-    FileIO.on("modification", function(){
-        var containers=document.body.querySelectorAll(".itemcontainer");
-        console.log("containers",containers);
-        for (var i=0; i<containers.length; i++) {
-            containers[i].updateContainerView();
-        };
-    });
-  return API;
+	FileIO.on("modification", function(){
+		var containers=document.body.querySelectorAll(".itemcontainer");
+		console.log("containers",containers);
+		for (var i=0; i<containers.length; i++) {
+			containers[i].updateContainerView();
+		}
+	});
+	return API;
 }());
