@@ -5,6 +5,81 @@
 
 	var contextMenuActions = {};
 
+	function FileItemView(element = document.createElement("div"), viewMode="icons") {
+		this.element = element;
+		element.itemView= this;
+		this.singleClickOpen=false;
+		element.addClass("itemcontainer");
+		element.appendNew("ul","fileview "+viewMode);
+		element.addEventListener("dragover",handleDragOver,false);
+		element.addEventListener("dragleave",handleDragLeave,false);
+		element.addEventListener("drop",handleDragDrop,false);
+	}
+
+	CustomEvents.bindEventsToClass(FileItemView);
+	API.FileItemView=FileItemView;
+
+	FileItemView.prototype.updateView = function() {
+		let element=this.element;
+		var name=element.dataset["fullname"];
+
+		var list = element.querySelector("ul.fileview");
+
+		var children=Array.prototype.slice.call(list.children);
+		//var currentFiles=children.map(function(child) {return child.dataset["filename"]});
+
+		function compareFileItems (fileA,fileB){
+			function fileSignificance(file) {
+				switch (file.contentType) {
+					case "directory/bundle":  return("0_");
+					case "directory": return("1_");
+				}
+				return ("9_");
+			}
+			var a = fileSignificance(fileA)+fileA.filename;
+			var b = fileSignificance(fileB)+fileB.filename;
+			return a.localeCompare(b);
+		}
+
+		FileIO.getDirectoryListing(name, function (err,dir) {
+			dir.sort(compareFileItems);
+			dir.remove(function(f){return f.filename[0]==='.';});
+			dir.each(function(file) {file.fullName=file.path+"/"+file.filename;});
+			dir.each(function(file){
+				var c=children.findIndex(function(i){return i.fileInfo.fullName===file.fullName;});
+				if (c >= 0) {
+					//it's already there.
+					children.removeAt(c);
+				} else {
+					list.appendChild(sys.modules.fileItem.createItem(file));
+				}
+			});
+			children.each(function(n){n.parentNode.removeChild(n);});
+		});
+
+	};
+
+	FileItemView.prototype.setViewPoint = function (filename) {
+		var element=this.element;
+
+		name=FileIO.normalizePath(filename);
+		if (name!==filename) console.log("normalised ",filename," to ",name);
+		FileIO.stat(filename,function(err,result) {if (!err) element.stat=result;});
+
+		this.signal("viewchanged",filename);
+		element.dataset["fullname"]=name;
+		element.dataset["filename"]=name=="/"?"":name;
+		var list = element.querySelector("ul.fileview");
+		if (!list) list=element.appendNew("ul","fileview icons");
+		list.innerHTML="";
+
+		this.updateView();
+	};
+
+	FileItemView.prototype.getViewPoint = function () {
+		return this.element.dataset["fullname"];
+	};
+
 	function notImplemented(action,filename) {
 		log("action '"+action+"' not implemented.  filename="+filename);
 	}
@@ -59,10 +134,15 @@
 			var currentSelection = Array.prototype.slice.call(p.querySelectorAll("li.selected"));
 			currentSelection.each(function(i){i.removeClass("selected");});
 			e.currentTarget.addClass("selected");
+			console.log("item selected", p.itemView);
+			if (p.itemView instanceof FileItemView)  {
+				p.itemView.signal("select",getFileItemData(e.currentTarget));
+			}
+
 		}
 	}
 
-	function trigger(e) {
+	function open(e) {
 		var p=e.currentTarget.parentNode.parentNode;
 		if (Object.isFunction(p.defaultHandler)) {
 			console.log("default handler triggered");
@@ -75,14 +155,14 @@
 	function handleClick(e) {
 		var p=e.currentTarget.parentNode.parentNode; // <li> -> <ul> -> wrapper div;
 		if (p.singleClickTrigger) {
-			trigger(e);
+			open(e);
 		} else {
 			select(e);
 		}
 	}
 
 	function doubleClick(e) {
-		trigger(e);
+		open(e);
 	}
 	function getFileItemData(element) {
 		var result = {
@@ -151,77 +231,9 @@
 		return false;
 	}
 
-	function FileItemView(element = document.createElement("div"), viewMode="icons") {
-		this.element = element;
-		element.itemView= this;
-		this.singleClickOpen=false;
-		element.addClass("itemcontainer");
-		element.appendNew("ul","fileview "+viewMode);
-		element.addEventListener("dragover",handleDragOver,false);
-		element.addEventListener("dragleave",handleDragLeave,false);
-		element.addEventListener("drop",handleDragDrop,false);
-	}
-
-	CustomEvents.bindEventsToClass(FileItemView);
-
-	FileItemView.prototype.updateView = function() {
-		let element=this.element;
-		var name=element.dataset["fullname"];
-
-		var list = element.querySelector("ul.fileview");
-
-		var children=Array.prototype.slice.call(list.children);
-		//var currentFiles=children.map(function(child) {return child.dataset["filename"]});
-
-		function compareFileItems (fileA,fileB){
-			function fileSignificance(file) {
-				switch (file.contentType) {
-					case "directory/bundle":  return("0_");
-					case "directory": return("1_");
-				}
-				return ("9_");
-			}
-			var a = fileSignificance(fileA)+fileA.filename;
-			var b = fileSignificance(fileB)+fileB.filename;
-			return a.localeCompare(b);
-		}
-
-		FileIO.getDirectoryListing(name, function (err,dir) {
-			dir.sort(compareFileItems);
-			dir.remove(function(f){return f.filename[0]==='.';});
-			dir.each(function(file) {file.fullName=file.path+"/"+file.filename;});
-			dir.each(function(file){
-				var c=children.findIndex(function(i){return i.fileInfo.fullName===file.fullName;});
-				if (c >= 0) {
-					//it's already there.
-					children.removeAt(c);
-				} else {
-					list.appendChild(sys.modules.fileItem.createItem(file));
-				}
-			});
-			children.each(function(n){n.parentNode.removeChild(n);});
-		});
-
-	};
-
-	FileItemView.prototype.setViewPoint = function (filename) {
-		var element=this.element;
-
-		name=FileIO.normalizePath(filename);
-		if (name!==filename) console.log("normalised ",filename," to ",name);
-		FileIO.stat(filename,function(err,result) {if (!err) element.stat=result;});
-
-		element.dataset["fullname"]=name;
-		element.dataset["filename"]=name=="/"?"":name;
-		var list = element.querySelector("ul.fileview");
-		if (!list) list=element.appendNew("ul","fileview icons");
-		list.innerHTML="";
-
-		this.updateView();
-	};
 
 	API.createItemContainer = function (element,viewMode) {
-		return new FileItemView (element,viewMode);
+		return new FileItemView(element,viewMode);
 	};
 
 	API.createItem = function (file) {
