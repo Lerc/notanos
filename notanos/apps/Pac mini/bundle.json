@@ -7,8 +7,8 @@
 			"contentType":"application/webapp",
 			"parameters" : {
                     "title": "Pac Mini",
-					"windowWidth" :200,
-					"windowHeight" :165
+					"windowWidth" :113,
+					"windowHeight" :150
 			  }
 			}
 }
