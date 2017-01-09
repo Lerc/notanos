@@ -1,0 +1,14 @@
+{
+	"bundleType" : "bundle/webapp",
+    "icon" : "Photo_2.png",
+	"exec" : {
+			"action" :"Open",
+			"main": "index.html",
+			"contentType":"application/webapp",
+			"parameters" : {
+					"windowWidth" :300,
+					"windowHeight" :450,
+					"singleInstance" : true
+			  }
+			}
+}
