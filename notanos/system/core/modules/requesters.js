@@ -58,7 +58,7 @@
 		}
 
 		function saveButtonClick() {
-			var savename = currentDirectory+dialog.filename.value;
+			var savename = currentDirectory+"/"+dialog.filename.value;
 			FileIO.exists(savename,function(itdoes) {
 				var saveit=true;
 				if (itdoes & (options.overwriteQuery===true)) {
