@@ -1,0 +1,13 @@
+{
+	"bundleType" : "bundle/webapp",
+    "icon" : "App.png",
+	"exec" : {
+			"action" :"Open",
+			"main": "index.html",
+			"contentType":"application/webapp",
+			"parameters" : {
+					"windowWidth" :800,
+					"windowHeight" :580
+			  }
+			}
+}

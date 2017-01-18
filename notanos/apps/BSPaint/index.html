@@ -1,0 +1,412 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>PicView</title>
+		<script src="jquery.min.js"></script>
+		<script src="clientframe.js"></script>
+
+  </head>
+
+	<style>
+	.noselect {
+		  -webkit-touch-callout: none;
+	    -webkit-user-select: none;
+	     -khtml-user-select: none;
+	       -moz-user-select: none;
+	        -ms-user-select: none;
+	            user-select: none;
+						}
+	.nodrag {
+		user-drag: none;
+		-webkit-user-drag: none;
+
+  }
+		.panel {
+			position: absolute;
+			left:0px;
+			right:0px;
+			top:0px;
+			height:36px;
+		}
+		.button {
+			transition: all 0.05s;
+			display: inline-block;
+			border-radius: 4px;
+			width:32px;
+			height:32px;
+			margin:2px;
+			background-color : #ddd;
+
+			box-shadow: -1px -1px 1px 1px black inset, 1px 1px 1px 1px white inset;
+		}
+		.button:hover {
+			background-color : #eee;
+		}
+		.button:active {
+			background-color : white;
+			box-shadow: 1px 1px 1px 1px black inset, -1px -1px 1px 1px white inset;
+		}
+		.button.down {
+			background-color : #FFF;
+			box-shadow: 1px 1px 1px 1px black inset, -1px -1px 1px 1px white inset;
+		}
+		#palette {
+			position:absolute;
+			left:0px;
+			top:36px;
+			width:80px;
+			bottom:0px;
+		}
+		.paletteentry {
+			  width :32px;
+				height :32px;
+				display:inline-block;
+				border:1px solid black;
+				margin : 3px;
+		}
+		.background{
+			position:absolute;
+			left:88px;
+			right:0px;
+			top:36px;
+			bottom:0px;
+			overflow:hidden;
+			background-color:lightgrey;
+			margin: 4px;
+			box-shadow: 0px 0px 2px 2px black;
+		}
+		#drawing {
+			cursor:crosshair;
+			background-color:White;
+			background-image: linear-gradient(rgba(32,100,150,.05), transparent 2px),
+			linear-gradient(90deg, rgba(32,100,150,.05) 2px, transparent 2px),
+			linear-gradient(rgba(32,100,150,.1) 1px, transparent 1px),
+			linear-gradient(90deg, rgba(32,100,150,.1) 1px, transparent 1px);
+			background-size:100px 100px, 100px 100px, 20px 20px, 20px 20px;
+			background-position:-2px -2px, -2px -2px, -1px -1px, -1px -1px
+
+			transition: transform 0.5s;
+
+			position:absolute;
+			margin: auto;
+			left:0px;
+			top:0px;
+			image-rendering:pixelated;
+			image-rendering:-moz-crisp-edges;
+			transform : scale(2,2);
+			transition: transform 0.15s;
+		}
+
+		input[type="color"] {
+			width:48px;
+			height:32px;
+			padding:0px;
+			background:none;
+			border:none;
+			outline:none;
+		}
+		#foreground {
+			position: absolute;
+			bottom : 32px;
+			left : 12px;
+			z-index : 1;
+		}
+		#background {
+			position: absolute;
+			bottom : 20px;
+			left : 24px;
+		}
+
+		.fillparent {
+			position:absolute;
+			bottom:0px;
+			top:0px;
+			left:0px;
+			right:0px;
+		}
+		#save {
+			position:absolute;
+			top:0px;
+			bottom:0px;
+			right:0px;
+		}
+		#drawing>.eventoverlay {
+			transform: translate(-0.5px,-0.5px);
+		}
+	</style>
+  <body>
+
+<div>
+  <div class="panel noselect">
+		<div id="pixels" class="pen button" style="background-image:url(pixels.png);"></div>
+		<div id="tip1" class="pen button" style="background-image:url(tip_1.png);"></div>
+		<div id="tip2" class="pen button" style="background-image:url(tip_2.png);"></div>
+		<div id="tip3" class="pen button" style="background-image:url(tip_3.png);"></div>
+		<div id="tip5" class="pen button" style="background-image:url(tip_5.png);"></div>
+		<div id="tip9" class="pen button" style="background-image:url(tip_9.png);"></div>
+		<div id="eraser" class="pen button" style="background-image:url(eraser.png);"></div>
+		<div id="fine_eraser" class="pen button" style="background-image:url(fine_eraser.png);"></div>
+
+		<button id="save">Save as...</button>
+	</div>
+	<div id="palette" class="noselect">
+		<input id="foreground" type="color" value="black">
+		<input id="background" type="color" value="#ff00ff">
+
+	</div>
+	<div class="background noselect">
+		<div id="drawing">
+			<canvas> </canvas>
+			<div class="eventoverlay fillparent"> <div>
+	</div>
+</div>
+<script>
+
+	var initialPalette = [
+		"#000000","#ffffff",
+	  "#ff0000","#ff8000",
+		"#ffff00","#008000",
+		"#00ff00","#00ff80",
+		"#0080ff","#50C0ff",
+		"#0000ff","#8080ff",
+		"#a00060","#ff00ff",
+		"#ffa0a0","#a06040",
+		"#606060","#a0a0a0"];
+
+	var tip = {
+			lastX : 0,
+			lastY : 0,
+			x : 0.0,
+			y : 0.0,
+			size : 1,
+			colour : "green"
+		}
+
+	var pen=feltTip;
+
+	var palette=$("#palette");
+
+	for (let i of initialPalette) {
+			e=`<div class="paletteentry" style="background-color:${i}"> </div>`;
+			palette.append($(e).data("colour",i));
+	}
+
+	$(".paletteentry").on("mousedown", function(e) {
+		let c= $(e.currentTarget).data("colour");
+		console.log("color ",c,e.which);
+		if (e.which == 1) $("#foreground").val(c);
+		if (e.which == 3) $("#background").val(c);
+
+	}).on("contextmenu",
+  function(){return false;}
+	);
+
+
+
+ $(".pen.button").on("click", function(e) {
+	 $(".pen.button").removeClass("down");
+	 $(e.currentTarget).addClass("down");
+
+ });
+
+ $("#pixels").click(function(e) {pen=pixelTip;});
+ $("#tip1").click(function(e) {tip.size=1; pen=feltTip;});
+ $("#tip2").click(function(e) {tip.size=2; pen=feltTip;});
+ $("#tip3").click(function(e) {tip.size=3; pen=feltTip;});
+ $("#tip5").click(function(e) {tip.size=5; pen=feltTip;});
+ $("#tip9").click(function(e) {tip.size=9; pen=feltTip;});
+ $("#eraser").click(function(e) {tip.size=9; pen=eraserTip;});
+ $("#fine_eraser").click(function(e) {tip.size=9; pen=pixelClear;});
+
+	ClientFrame.onActionNotify=function(action) {
+		 if (action.actionKind=="Open") {
+
+			 $("#picture").attr("src",action.filename);
+		 }
+	}
+
+	var canvas=$("#drawing>canvas")[0];
+	canvas.width=640;
+	canvas.height=480;
+
+	var ctx=canvas.getContext("2d");
+
+	ctx.moveTo(50,50);
+	ctx.lineTo(600,400);
+	ctx.stroke();
+
+var scalefactor = 0;
+var scale = 1;
+var offsetX =0;
+var offsetY = 0;
+function setTransform( ) {
+	var trans =`translate(${offsetX}px,${offsetY}px) scale(${scale},${scale})`;
+	$("#drawing").css("transform",trans);
+}
+
+function scalefactorToSize(n) {
+	return (Math.pow(2,(n/2)));
+}
+
+function setScale(newfactor) {
+		var oldScale = scalefactorToSize(scalefactor);
+		var newScale = scalefactorToSize(newfactor);
+		var drawing = $("#drawing")
+		offsetX=offsetX/oldScale*newScale ;
+		offsetY=offsetY/oldScale*newScale ;
+		scale=newScale;
+		scalefactor=newfactor;
+		setTransform();
+}
+
+setTransform();
+
+function pixelTip(penInfo) {
+	console.log(penInfo)
+	let x=Math.floor(penInfo.x-0.25);
+	let y=Math.floor(penInfo.y-0.25);
+	ctx.fillStyle=penInfo.colour;
+	ctx.fillRect(x,y,1,1);
+}
+
+function feltTip(penInfo) {
+	ctx.lineWidth=penInfo.size;
+	ctx.strokeStyle=penInfo.colour;
+  ctx.lineCap="round";
+	let lastX=Math.round(penInfo.lastX);
+	let lastY=Math.round(penInfo.lastY);
+	let x=Math.round(penInfo.x);
+	let y=Math.round(penInfo.y);
+
+	ctx.beginPath();
+	ctx.moveTo(lastX,lastY);
+	ctx.lineTo(x,y);
+	ctx.stroke();
+}
+
+function eraserTip(penInfo) {
+	ctx.save();
+	ctx.lineWidth=penInfo.size;
+	ctx.strokeStyle="white";
+  ctx.lineCap="round";
+	ctx.globalCompositeOperation="destination-out";
+	let lastX=Math.round(penInfo.lastX);
+	let lastY=Math.round(penInfo.lastY);
+	let x=Math.round(penInfo.x);
+	let y=Math.round(penInfo.y);
+
+	ctx.beginPath();
+	ctx.moveTo(lastX,lastY);
+	ctx.lineTo(x,y);
+	ctx.stroke();
+	ctx.restore();
+}
+
+function pixelClear(penInfo) {
+	console.log(penInfo)
+	let x=Math.floor(penInfo.x-0.25);
+	let y=Math.floor(penInfo.y-0.25);
+	ctx.clearRect(x,y,1,1);
+}
+
+var dragging = false;
+var drawing = false;
+
+function draw(x,y) {
+	tip.lastX=tip.x;
+	tip.lastY=tip.y;
+	tip.x=x;
+	tip.y=y;
+	if (pen) pen(tip);
+}
+
+function startDraw(x,y) {
+	drawing=true;
+	tip.x=x;
+	tip.y=y;
+	draw(x,y);
+}
+
+
+var dragStartX=0;
+var dragStaryY=0;
+var mouseDownX=0;
+var mouseDownY=0;
+
+function stopDragging() {
+	dragging=false;
+	$("#drawing").css("transition" , "");
+}
+
+$("#drawing>.eventoverlay").on("mousedown", function (e) {
+	console.log("mousedown on drawing");
+	switch (e.button) {
+		case 0:
+
+			tip.colour = $("#foreground").val();
+			startDraw(e.offsetX,e.offsetY);
+			break;
+		case 1:
+			e.preventDefault();
+			dragStartX=offsetX;
+			dragStartY=offsetY;
+			mouseDownX=e.clientX;
+			mouseDownY=e.clientY;
+			$("#drawing").css("transition" , "none");
+			dragging = true;
+
+			break;
+		case 2:
+			tip.colour = $("#background").val();
+			startDraw(e.offsetX,e.offsetY);
+			e.preventDefault();
+			break;
+	}
+})
+
+.on("mousemove", function(e) {
+  if (dragging) {
+		if (e.buttons!==4) {
+			stopDragging();
+			return;
+		}
+		var dx = e.clientX-mouseDownX;
+		var dy = e.clientY-mouseDownY;
+		offsetX=dragStartX+dx;
+		offsetY=dragStartY+dy;
+		setTransform();
+	}
+	if (e.buttons === 0) drawing=false;
+	if (drawing) draw(e.offsetX,e.offsetY);
+}).on("contextmenu",
+function(){return false;}
+);
+
+function canvasPngAsBytes (canvas,callback) {
+  function handleBlob(blob) {
+		var reader = new FileReader();
+		reader.onload = function () {	callback(this.result);	};
+		reader.readAsArrayBuffer(blob);
+	}
+	canvas.toBlob(handleBlob);
+}
+
+  $(".background")[0].addEventListener("wheel",handleMouseWheel);
+
+	function handleMouseWheel(e) {
+		let direction = -Math.sign(e.deltaY);
+		setScale(scalefactor+direction);
+		setTransform();
+	}
+
+	$("#save").click(function() {
+		ClientFrame.saveFileDialog("~/",function (err,result) {
+				if (result) {
+						canvasPngAsBytes(canvas,function(bytes){ClientFrame.saveFile(result,bytes);});
+				}
+		});
+	})
+</script>
+  </body>
+</html>
