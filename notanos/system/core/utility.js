@@ -373,7 +373,7 @@ var Base64 = (function(){
 	};
 
 	API.replacer = function(key,value) {
-		if (ArrayBuffer.isView(value)) {
+		if (ArrayBuffer.isView(value) || (value instanceof ArrayBuffer)) {
 			var result =  {
 				base64 : Base64.encode(value)
 			};
@@ -390,6 +390,6 @@ var Base64 = (function(){
 		}
 		return value;
 	};
-	
+
 	return API;
 })();
