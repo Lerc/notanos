@@ -371,4 +371,25 @@ var Base64 = (function(){
 
 		return arraybuffer;
 	};
+
+	API.replacer = function(key,value) {
+		if (ArrayBuffer.isView(value)) {
+			var result =  {
+				base64 : Base64.encode(value)
+			};
+			return result;
+		}
+		return value;
+	};
+
+	API.reviver = function(key,value) {
+		if (typeof value === "object") {
+			if (value.hasOwnProperty("base64")) {
+				return Base64.decode(value.base64);
+			}
+		}
+		return value;
+	};
+	
+	return API;
 })();
