@@ -1,0 +1,14 @@
+#!/bin/bash
+
+#simple launcher that brings in node_modules if absent
+
+pushd `dirname $0` > /dev/null
+
+if [ ! -d "node_modules" ]; then
+	npm update
+fi
+
+SCRIPTPATH=`pwd`
+popd > /dev/null
+
+exec node $SCRIPTPATH/nodeterm.js

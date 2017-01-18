@@ -1,0 +1,14 @@
+
+{
+  "dependencies" : {
+        "pty.js" : "*",
+        "event-stream" : "*",
+	"headless-terminal" : "*",
+	"screen-buffer" : "*"
+
+  },
+
+  "private": true
+}
+
+
