@@ -296,7 +296,7 @@
 		var containers=document.body.querySelectorAll(".itemcontainer");
 		console.log("containers",containers);
 		for (var i=0; i<containers.length; i++) {
-			containers[i].updateContainerView();
+			containers[i].itemView.updateView();
 		}
 	});
 	return API;
