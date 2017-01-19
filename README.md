@@ -11,7 +11,9 @@ It does some cool things.
 ![](https://raw.github.com/Lerc/notanos/master/DnDfile.gif)
 
 
-Try it in an image on Dply.  [][![Dply](https://dply.co/b.svg)](https://dply.co/b/QKwLwnIq)
+Try it in an image on Dply. 
+ [![Dply](https://dply.co/b.svg)](https://dply.co/b/QKwLwnIq)
+ (select Centos 7, and a Free 2 hour server.  Wait a minute or two after you have the ip number before trying https:// )
 
 [Latest Clip](http://www.youtube.com/watch?v=oHwNxDWwuY4)
 This is the new userserv hosted notanos running on a CubieBoard2. I talk through what I'm doing,  The video shows some features of the bridge to the
