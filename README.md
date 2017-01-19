@@ -21,6 +21,7 @@ security warning messages in the browser, which you will have to provide a tempo
  (select Centos 7, and a Free 2 hour server.  Wait a minute or two after you have the ip number before trying https:// )
 
 
+###Videos
 
 [Latest Clip](http://www.youtube.com/watch?v=oHwNxDWwuY4)
 This is the new userserv hosted notanos running on a CubieBoard2. I talk through what I'm doing,  The video shows some features of the bridge to the
@@ -42,7 +43,7 @@ Installation was moderately easy,  then it got harder (sorry).  The install scri
 	Set up a reverse proxy to handle https (and hopefully http2 etc.) forwarding to localhost.  I use nginx  with the following config
 
 ```
-	server {
+server {
   listen 443 ssl;
   server_name squishy.local;
 
@@ -72,12 +73,13 @@ Installation was moderately easy,  then it got harder (sorry).  The install scri
 
 Then grab the Notanos files themselves and place then your home directory
 
-		cd ~
+    cd ~
     wget http://fingswotidun.com/cruft/notanos.tar.gz
     tar -xzf notanos.tar.gz
     ln -sr notanos-0.8.0/notanos ~/Notanos
 
 To run the server component run (as root)
+
     userserv -nx
 
 Then from a browser.
