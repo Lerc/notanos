@@ -14,8 +14,13 @@ It does some cool things.
 ##Try it in an image on Dply.
 
  [![Dply](https://dply.co/b.svg)](https://dply.co/b/QKwLwnIq)
- 
+
+This will let you try out Notanos using an IP number and a self-signed certificate.  This means you'll get
+security warning messages in the browser, which you will have to provide a temporary exception.
+
  (select Centos 7, and a Free 2 hour server.  Wait a minute or two after you have the ip number before trying https:// )
+
+
 
 [Latest Clip](http://www.youtube.com/watch?v=oHwNxDWwuY4)
 This is the new userserv hosted notanos running on a CubieBoard2. I talk through what I'm doing,  The video shows some features of the bridge to the
@@ -35,6 +40,7 @@ Installation was moderately easy,  then it got harder (sorry).  The install scri
   Follow the instructions on the userserv page to build and install  ( it's just  git clone; make all; make install)
 
 	Set up a reverse proxy to handle https (and hopefully http2 etc.) forwarding to localhost.  I use nginx  with the following config
+
 ```
 	server {
   listen 443 ssl;
