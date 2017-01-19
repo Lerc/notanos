@@ -11,8 +11,10 @@ It does some cool things.
 ![](https://raw.github.com/Lerc/notanos/master/DnDfile.gif)
 
 
-Try it in an image on Dply. 
+##Try it in an image on Dply.
+
  [![Dply](https://dply.co/b.svg)](https://dply.co/b/QKwLwnIq)
+ 
  (select Centos 7, and a Free 2 hour server.  Wait a minute or two after you have the ip number before trying https:// )
 
 [Latest Clip](http://www.youtube.com/watch?v=oHwNxDWwuY4)
